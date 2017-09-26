@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.common.AddressMapper">
+
+	<resultMap id="addressMap" type="Address">
+		<id property="regionCd" column="region_cd" />
+		<result property="sidoNm" column="sido_nm"/>
+		<result property="sggNm" column="sgg_nm"/>
+		<result property="emdNm" column="emd_nm"/>
+		<result property="sortOrder" column="sort_order"/>
+	</resultMap>
+
+	<select id="selectSidoList" resultMap="addressMap">
+		/* selectSidoList */
+		SELECT region_cd,
+		       sido_nm,
+		       sgg_nm,
+		       emd_nm,
+		       sort_order
+		  FROM v_address_h
+		 WHERE region_cd LIKE '__00000000'
+		   AND cancel_date IS NULL
+		ORDER BY sort_order, region_cd
+	</select>
+
+	<select id="selectSggList" resultMap="addressMap">
+		/* selectSggList */
+		SELECT region_cd,
+		       sido_nm,
+		       sgg_nm,
+		       emd_nm,
+		       sort_order
+		  FROM v_address_h
+		 WHERE region_cd LIKE concat(substr(#{sidoCode}, 1, 2), '___00000')
+		   AND region_cd NOT LIKE concat(substr(#{sidoCode}, 1, 2), '00000000')
+		ORDER BY sort_order, region_cd
+	</select>
+
+	<select id="selectEmdList" resultMap="addressMap">
+		/* selectEmdList */
+		SELECT region_cd,
+		       sido_nm,
+		       sgg_nm,
+		       emd_nm,
+		       sort_order
+		  FROM v_address_h
+		 WHERE region_cd LIKE concat(substr(#{sggCode}, 1, 5), '_____')
+		   AND region_cd NOT LIKE concat(substr(#{sggCode}, 1, 5), '00000')
+		ORDER BY sort_order, region_cd
+	</select>
+
+	<select id="selectAddress" resultMap="addressMap">
+		/* selectAddress */
+		SELECT region_cd,
+		       sido_nm,
+		       sgg_nm,
+		       emd_nm,
+		       sort_order
+		  FROM v_address_h
+		 WHERE region_cd = #{regionCd}
+	</select>
+	
+</mapper>

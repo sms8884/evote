@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.BannerPopMapper">
+
+	<sql id="SQL_SELECT_BANNER_POP">
+		SELECT bp_seq,
+		       site_cd,
+		       type,
+		       dest,
+		       dest_seq,
+		       CASE
+		          WHEN dest = 'V' THEN (SELECT title FROM vote_mst WHERE vote_mst.vote_seq = dest_seq)
+		          WHEN dest = 'P' THEN (SELECT title FROM pssrp WHERE pssrp.ps_seq = dest_seq)
+		       END AS dest_title,
+		       title,
+		       dp_yn,
+		       dp_type,
+		       start_date,
+		       date_format(start_date, '%Y-%m-%d') AS strStartDate,
+		       date_format(start_date, '%H') AS strStartTime,
+		       end_date,
+		       date_format(end_date, '%Y-%m-%d') AS strEndDate,
+		       date_format(end_date, '%H') AS strEndTime,
+		       reg_user,
+		       reg_date,
+		       mod_user,
+		       mod_date
+		  FROM banner_pop
+		 WHERE site_cd = #{siteCd}
+		   AND type = #{type}
+	</sql>
+	<sql id="SQL_SEARCH_BANNER_POP_LIST">
+
+		<if test='@com.jaha.evote.common.util.StringUtils@isNotEmpty(searchDest)'>
+		  AND dest = #{searchDest}
+		</if>
+		
+		<if test='@com.jaha.evote.common.util.StringUtils@isNotEmpty(searchDpYn)'>
+		  AND dp_yn = #{searchDpYn}
+		</if>
+
+		<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(searchStartDate) and @com.jaha.evote.common.util.StringUtils@isNotEmpty(searchEndDate)">
+		<![CDATA[
+		  AND reg_date BETWEEN STR_TO_DATE(#{searchStartDate}, '%Y-%m-%d') AND DATE_ADD(STR_TO_DATE(#{searchEndDate}, '%Y-%m-%d'), INTERVAL 1 DAY)
+		]]>
+		</if>
+		
+		<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(searchText)">
+		  AND title LIKE CONCAT('%',#{searchText},'%')
+		</if>
+				
+	</sql>
+	
+	<select id="selectBannerPopListCount" parameterType="BannerPop" resultType="int">
+		/* selectBannerPopListCount */
+		SELECT count(*)
+		  FROM banner_pop
+		 WHERE site_cd = #{siteCd}
+		   AND type = #{type}
+		<include refid="SQL_SEARCH_BANNER_POP_LIST" />
+	</select>
+	
+	<select id="selectBannerPopList" parameterType="BannerPop" resultType="BannerPop">
+		/* selectBannerPopList */
+		SELECT t.*,
+		       CASE
+		          WHEN t.dest = 'V' THEN (SELECT title FROM vote_mst WHERE vote_mst.vote_seq = t.dest_seq)
+		          WHEN t.dest = 'P' THEN (SELECT title FROM pssrp WHERE pssrp.ps_seq = t.dest_seq)
+		       END AS dest_title
+		  FROM (
+				<include refid="SQL_SELECT_BANNER_POP" />
+				<include refid="SQL_SEARCH_BANNER_POP_LIST" />
+				ORDER BY bp_seq DESC
+				LIMIT #{startRow}, #{pagingRow}
+			) t
+	</select>
+
+	<select id="selectBannerPop" parameterType="Map" resultType="BannerPop">
+		/* selectBannerPop */
+		<include refid="SQL_SELECT_BANNER_POP" />
+		   AND bp_seq = #{bpSeq}
+	</select>
+
+	<select id="selectMainBannerPopList" parameterType="Map" resultType="BannerPop">
+	<![CDATA[
+		/* selectMainBannerPopList */
+		SELECT t.*
+		  FROM (SELECT b.*,
+		               d.title AS dest_title,
+		               d.start_date AS dest_start_date,
+		               d.end_date AS dest_end_date
+		          FROM banner_pop b JOIN vote_mst d ON b.dest_seq = d.vote_seq
+		         WHERE b.site_cd = #{siteCd}
+		           AND b.type = #{type}
+		           AND b.dest = 'V'
+		           AND b.dp_yn = 'Y'
+		           AND b.del_yn = 'N'
+		           /* AND d.vote_status = 'N' */
+		           AND (b.dp_type = 'A' OR b.start_date <= now())
+		           AND (b.dp_type = 'A' OR b.end_date >= now())
+		        UNION ALL
+		        SELECT b.*,
+		               d.title AS dest_title,
+		               d.start_date AS dest_start_date,
+		               d.end_date AS dest_end_date
+		          FROM banner_pop b JOIN pssrp d ON b.dest_seq = d.ps_seq
+		         WHERE b.site_cd = #{siteCd}
+		           AND b.type = #{type}
+		           AND b.dest = 'P'
+		           AND b.dp_yn = 'Y'
+		           AND b.del_yn = 'N'
+		           /* AND d.del_yn = 'N' */
+		           AND (b.dp_type = 'A' OR b.start_date <= now())
+		           AND (b.dp_type = 'A' OR b.end_date >= now())) t
+		ORDER BY t.reg_date DESC
+	]]>
+	</select>
+
+	<insert id="insertBannerPop" parameterType="BannerPop" useGeneratedKeys="true" keyColumn="bp_seq" keyProperty="bpSeq">
+		/* insertBannerPop */
+		INSERT INTO banner_pop
+		(
+			site_cd,
+			type,
+			dest,
+			dest_seq,
+			title,
+			dp_yn,
+			dp_type,
+			del_yn,
+			<if test='@com.jaha.evote.common.util.StringUtils@equals(dpType, "S")'>
+			start_date,
+			end_date,
+			</if>
+			reg_user,
+			reg_date
+		)
+		VALUES 
+		(
+			#{siteCd},
+			#{type},
+			#{dest},
+			#{destSeq},
+			#{title},
+			#{dpYn},
+			#{dpType},
+			'N',
+			<if test='@com.jaha.evote.common.util.StringUtils@equals(dpType, "S")'>
+			STR_TO_DATE(#{strStartDate} #{strStartTime}, '%Y-%m-%d %H'),
+			STR_TO_DATE(#{strEndDate} #{strEndTime}, '%Y-%m-%d %H'),
+			</if>
+			#{regUser},
+			now()
+		)
+	</insert>
+	
+	<update id="updateBannerPop">
+		/* updateBannerPop */
+		UPDATE banner_pop
+		   SET dest = #{dest},
+		       dest_seq = #{destSeq},
+		       title = #{title},
+		       dp_yn = #{dpYn},
+		       dp_type = #{dpType},
+		       <if test='@com.jaha.evote.common.util.StringUtils@equals(dpType, "A")'>
+		       start_date = null,
+		       end_date = null,
+		       </if>
+		       <if test='@com.jaha.evote.common.util.StringUtils@equals(dpType, "S")'>
+		       start_date = STR_TO_DATE(#{strStartDate} #{strStartTime}, '%Y-%m-%d %H'),
+		       end_date = STR_TO_DATE(#{strEndDate} #{strEndTime}, '%Y-%m-%d %H'),
+		       </if>
+		       mod_user = #{modUser},
+		       mod_date = now()
+		 WHERE bp_seq = #{bpSeq}
+	</update>
+	
+</mapper>

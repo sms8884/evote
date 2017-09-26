@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.common.FileMapper">
+
+	<resultMap id="fileMap" type="FileInfo">
+		<id property="fileSeq" column="file_seq" />
+		<result property="fileGrpType" column="file_grp_type" />
+		<result property="fileGrpSeq" column="file_grp_seq" />
+		<result property="fileType" column="file_type" />
+		<result property="fileOrd" column="file_ord" />
+		<result property="fileNm" column="file_nm" />
+		<result property="filePath" column="file_path" />
+		<result property="fileSrcNm" column="file_src_nm" />
+		<result property="fileExt" column="file_ext" />
+		<result property="fileSize" column="file_size" />
+		<result property="fileDesc" column="file_desc" />
+		<result property="deleteYn" column="delete_yn" />
+		<result property="regId" column="reg_id" />
+		<result property="regDate" column="reg_date" />
+		<result property="modId" column="mod_id" />
+		<result property="modDate" column="mod_date" />
+	</resultMap>
+
+	<sql id="sqlSelectFileInfo">
+		SELECT file_seq,
+		       file_grp_type,
+		       file_grp_seq,
+		       file_type,
+		       file_ord,
+		       file_nm,
+		       file_path,
+		       file_src_nm,
+		       file_ext,
+		       file_size,
+		       file_desc,
+		       delete_yn,
+		       reg_date,
+		       reg_user,
+		       mod_date,
+		       mod_user
+		  FROM file_info
+	</sql>
+
+	<select id="selectFileInfo" parameterType="Long" resultMap="fileMap">
+		/* selectFileInfo */
+		<include refid="sqlSelectFileInfo" />
+		 WHERE file_seq = #{fileSeq}
+		   AND delete_yn = 'N'
+	</select>
+
+	<select id="selectFileInfoList" parameterType="java.util.Map" resultMap="fileMap">
+		/* selectFileInfoList */
+		<include refid="sqlSelectFileInfo" />
+		 WHERE file_grp_seq = #{fileGrpSeq}
+		   AND file_grp_type = #{fileGrpType}
+		   <if test="fileType != null">
+		   AND file_type = #{fileType}
+		   </if>
+		   AND delete_yn = 'N'
+		 ORDER BY file_ord
+	</select>
+
+	<insert id="insertFileInfo" parameterType="FileInfo" useGeneratedKeys="true" keyColumn="file_seq" keyProperty="fileSeq">
+		/* insertFileInfo */
+		INSERT INTO file_info
+		(
+			file_grp_type,
+			file_grp_seq,
+			file_type,
+			file_ord,
+			file_nm,
+			file_path,
+			file_src_nm,
+			file_ext,
+			file_size,
+			file_desc,
+			delete_yn,
+			reg_date,
+			reg_user
+		)
+		VALUES 
+		(
+			#{fileGrpType},
+			#{fileGrpSeq},
+			#{fileType},
+			#{fileOrd},
+			#{fileNm},
+			#{filePath},
+			#{fileSrcNm},
+			#{fileExt},
+			#{fileSize},
+			#{fileDesc},
+			'N',
+			now(),
+			#{regUser}
+		)
+	</insert>
+	
+	<update id="deleteFileInfo" parameterType="FileInfo">
+		/* deleteFileInfo */
+		UPDATE file_info
+		   SET delete_yn = 'Y',
+		       mod_date = now(),
+		       mod_user = #{modUser}
+		 WHERE file_seq = #{fileSeq}
+	</update>
+	
+	<update id="deleteFileGroup" parameterType="FileInfo">
+		/* deleteFileGroup */
+		UPDATE file_info
+		   SET delete_yn = 'Y',
+		       mod_date = now(),
+		       mod_user = #{modUser}
+		 WHERE file_grp_seq = #{fileGrpSeq}
+		   AND file_grp_type = #{fileGrpType}
+		 <if test="fileType != null">		  
+			AND file_type = #{fileType} 
+		</if>
+	</update>
+	
+</mapper>

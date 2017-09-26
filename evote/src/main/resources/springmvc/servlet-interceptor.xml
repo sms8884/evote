@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/mvc 
+	http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+	<mvc:interceptors>
+		<bean class="org.springframework.mobile.device.DeviceResolverHandlerInterceptor"/>
+		<bean class="org.springframework.mobile.device.site.SitePreferenceHandlerInterceptor"/>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:exclude-mapping path="/resources/**" />
+			<bean class="com.jaha.evote.common.interceptor.SiteCheckInterceptor">
+			</bean>				
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/member/info" />
+			<mvc:mapping path="/member/modify-proc" />
+			<mvc:mapping path="/member/upgrade" />
+			<mvc:mapping path="/member/upgrade-proc" />
+			<mvc:mapping path="/member/terms-agree" />
+			<mvc:mapping path="/cmit/cmit_contest_wrtieForm/**" />
+			<bean class="com.jaha.evote.common.interceptor.SessionCheckInterceptor">
+			</bean>				
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+</beans>

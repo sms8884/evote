@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:cache="http://www.springframework.org/schema/cache"
+	   xmlns:task="http://www.springframework.org/schema/task"
+	   xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans.xsd
+						   http://www.springframework.org/schema/tx 		http://www.springframework.org/schema/tx/spring-tx.xsd
+						   http://www.springframework.org/schema/context 	http://www.springframework.org/schema/context/spring-context.xsd
+						   http://mybatis.org/schema/mybatis-spring 		http://mybatis.org/schema/mybatis-spring.xsd
+						   http://www.springframework.org/schema/util 		http://www.springframework.org/schema/util/spring-util.xsd
+						   http://www.springframework.org/schema/cache		http://www.springframework.org/schema/cache/spring-cache.xsd
+						   http://www.springframework.org/schema/task 		http://www.springframework.org/schema/task/spring-task.xsd
+						   http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring	http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
+
+	<!-- properties -->
+	<util:properties id="system" location="classpath:properties/${spring.profiles.active}/*.properties"/>
+	<util:properties id="config" location="classpath:properties/common/*.properties "/>
+	<!-- <util:properties id="message" location="classpath:message/message.properties "/> -->
+	<context:property-placeholder properties-ref="system" order="1" ignore-unresolvable="true" />
+	<context:property-placeholder properties-ref="config" order="2" ignore-unresolvable="true" />
+	<!-- <context:property-placeholder properties-ref="message" order="3" ignore-unresolvable="true" /> -->
+
+    <!-- 캐쉬 설정 시작 -->
+	<ehcache:annotation-driven />
+	<ehcache:config cache-manager="cacheManager">
+		<ehcache:evict-expired-elements interval="60" />
+	</ehcache:config>
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" >
+		<property name="configLocation"  value="classpath:cache/ehcache.xml"/>
+	</bean> 
+    <!-- 캐쉬 설정 끝 -->
+
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:messages/message</value>
+			</list>
+		</property>
+		<property name="defaultEncoding" value="UTF-8"/>
+	</bean>
+
+    <context:annotation-config/>
+    
+    <context:component-scan base-package="com.jaha.evote" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+    </context:component-scan>
+	
+	<!-- DataSource -->
+ 	<bean id="dataSourceSpied" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+ 		<property name="driverClass" value="${jdbc.driver}"/>
+		<property name="jdbcUrl" value="${jdbc.url}"/>
+		<property name="user" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+		<!-- pool sizing -->
+		<property name="initialPoolSize" value="5" />
+		<property name="minPoolSize" value="5" />
+		<property name="maxPoolSize" value="30" />
+		<!-- refreshing connections -->
+		<property name="maxIdleTime" value="180" /> <!-- 3min -->
+		<property name="maxConnectionAge" value="10" /> <!-- 1h -->
+		<!-- timeouts and testing -->
+		<property name="checkoutTimeout" value="5000" /> <!-- 5s -->
+		<property name="idleConnectionTestPeriod" value="60" /> <!-- 60 -->
+		<property name="testConnectionOnCheckout" value="true" />
+		<property name="preferredTestQuery" value="SELECT 1" />
+		<property name="testConnectionOnCheckin" value="true" />
+    </bean>
+    
+    <bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+        <constructor-arg ref="dataSourceSpied" />
+        <property name="logFormatter">
+				<bean class="com.jaha.evote.common.formatter.Log4JdbcFormatter">
+                <property name="loggingType" value="MULTI_LINE" />
+                <property name="sqlPrefix" value="SQL:::"/>
+            </bean>
+        </property>
+    </bean>
+	
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="txManager" />
+	<!-- //DataSource -->
+	
+    <!-- MyBatis -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:/config/mybatis-config.xml" />
+	    <property name="mapperLocations" value="classpath:/mybatis/**/*mapper.xml" />
+	</bean>
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory"/>
+	</bean>
+	<mybatis:scan base-package="com.jaha.evote.mapper" />
+	<!-- //MyBatis -->
+	
+	<!-- XecureDB -->
+	<bean id="xdspNative" class="com.softforum.xdbe.XdspNative" init-method="propertyInitialize"/>
+	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod" value="com.softforum.xdbe.XdspNative.setPropertiesFile"/>
+		<property name="arguments">
+			<list>
+				<value>${xecuredb.conf.path}</value>
+		    </list>
+		</property>
+	</bean>
+    <!-- //xecuredb -->
+	
+	<!-- redis -->
+	<bean class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration"/>
+	<bean id="jedisConnectinFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="hostName" value="${profile.redis.hostName}" />
+		<property name="port" value="${profile.redis.port}" />
+		<property name="usePool" value="true"/>
+	</bean>
+	<bean class="org.springframework.session.data.redis.RedisOperationsSessionRepository" name="sessionRepository" >
+		<constructor-arg name="redisConnectionFactory" ref="jedisConnectinFactory" />
+	</bean>
+<!--
+	<util:constant static-field="org.springframework.session.data.redis.config.ConfigureRedisAction.NO_OP"/>
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+	    <property name="connectionFactory" ref="jedisConnectinFactory" />
+	    <property name="keySerializer" ref="stringRedisSerializer" />
+	    <property name="valueSerializer" ref="stringRedisSerializer" />
+	</bean>
+	<bean id="stringRedisSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+-->
+	<!-- //redis -->
+		
+	<!-- mail -->
+	<bean id="mailSender" class ="org.springframework.mail.javamail.JavaMailSenderImpl" >
+	    <property name="host" value="${mail.host}" />
+	    <property name="port" value="${mail.port}" />
+	    <property name="username" value="${mail.username}" />
+	    <property name="password" value="${mail.password}" />
+	    <property name="javaMailProperties">
+	    <props>
+	        <prop key="mail.smtp.starttls.enable">true</prop>
+			<prop key="mail.transport.protocol">smtp</prop>
+			<prop key="mail.smtp.auth">true</prop>
+	    </props>
+	    </property>
+	</bean>
+	<!-- //mail -->
+
+</beans>

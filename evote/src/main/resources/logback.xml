@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator class="ch.qos.logback.classic.sift.JNDIBasedContextDiscriminator">
+            <defaultValue>unknown</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                    <pattern>%d{ISO8601, Asia/Seoul} [%thread] %-5level %logger{36} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </sift>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/data/evote/logs/evote.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d : [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+	<appender name="SCHEDULER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/data/evote/logs/schedule.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d : [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+	</appender>
+	
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are  by default assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+	
+	<logger name="org.springframework" level="INFO" additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+    <!-- Query Loggers -->
+    <logger name="log4jdbc.debug" level="OFF"/>
+    <logger name="jdbc.audit" level="OFF"/>
+    <logger name="jdbc.connection" level="OFF"/>
+    <logger name="jdbc.resultset" level="OFF"/>
+    <logger name="jdbc.resultsettable" level="OFF"/>
+    <logger name="jdbc.sqltiming" level="OFF"/>
+<!-- 
+    <logger name="jdbc.sqlonly" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="FILE" />
+        <appender-ref ref="SIFT"/>
+    </logger>
+-->
+	<if condition='"${spring.profiles.active}".contains("loc")'>
+		<then>
+			<logger name="com.jaha.evote" level="DEBUG"/>
+			<logger name="com.mchange.v2" level="INFO"/>
+			<logger name="jdbc.sqlonly" additivity="false">
+				<level value="INFO"/>
+				<appender-ref ref="SIFT"/>
+			</logger>
+			<logger name="com.jaha.evote.scheduler" level="INFO" additivity="false">
+				<appender-ref ref="SCHEDULER" />
+			</logger>
+			<root level="DEBUG">
+				<appender-ref ref="FILE" />
+				<appender-ref ref="SIFT"/>
+			</root>
+		</then>
+	</if>
+	<if condition='"${spring.profiles.active}".contains("dev")'>
+        <then>
+			<logger name="com.jaha.evote" level="DEBUG"/>
+			<logger name="com.mchange.v2" level="INFO"/>
+			<logger name="jdbc.sqlonly" additivity="false">
+				<level value="INFO"/>
+				<appender-ref ref="SIFT"/>
+			</logger>
+			<logger name="com.jaha.evote.scheduler" level="INFO" additivity="false">
+				<appender-ref ref="SCHEDULER" />
+			</logger>
+			<root level="DEBUG">
+				<appender-ref ref="FILE" />
+				<appender-ref ref="SIFT"/>
+			</root>
+        </then>
+	</if>
+	<if condition='"${spring.profiles.active}".contains("staging")'>
+        <then>
+			<logger name="com.jaha.evote" level="DEBUG"/>
+			<logger name="com.mchange.v2" level="INFO"/>
+			<logger name="jdbc.sqlonly" additivity="false">
+				<level value="INFO"/>
+				<appender-ref ref="SIFT"/>
+			</logger>
+			<logger name="com.jaha.evote.scheduler" level="INFO" additivity="false">
+				<appender-ref ref="SCHEDULER" />
+			</logger>
+			<root level="DEBUG">
+				<appender-ref ref="FILE" />
+				<appender-ref ref="SIFT"/>
+			</root>
+        </then>
+	</if>
+<!-- 	
+	<if condition='"${spring.profiles.active}".contains("real")'>
+        <then>
+		    <logger name="com.jaha.evote" level="INFO"/>
+		    <logger name="com.mchange.v2" level="WARN"/>
+			<logger name="jdbc.sqlonly" additivity="false">
+				<level value="WARN"/>
+				<appender-ref ref="SIFT"/>
+			</logger>
+			<logger name="com.jaha.evote.scheduler" level="INFO" additivity="false">
+				<appender-ref ref="SCHEDULER" />
+			</logger>
+		    <root level="WARN">
+		        <appender-ref ref="FILE" />
+		    </root>
+        </then>
+	</if>
+-->	
+	<!-- 모니터링용 임시 로그레벨 수정 -->
+	<if condition='"${spring.profiles.active}".contains("real")'>
+        <then>
+		    <logger name="com.jaha.evote" level="DEBUG"/>
+		    <logger name="com.mchange.v2" level="INFO"/>
+			<logger name="jdbc.sqlonly" additivity="false">
+				<level value="INFO"/>
+				<appender-ref ref="SIFT"/>
+			</logger>
+			<logger name="com.jaha.evote.scheduler" level="INFO" additivity="false">
+				<appender-ref ref="SCHEDULER" />
+			</logger>
+		    <root level="DEBUG">
+		        <appender-ref ref="FILE" />
+		    </root>
+        </then>
+	</if>
+
+</configuration>

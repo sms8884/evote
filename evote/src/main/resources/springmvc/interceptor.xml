@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/mvc 
+	http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+	<mvc:interceptors>
+		<bean class="org.springframework.mobile.device.DeviceResolverHandlerInterceptor"/>
+		<bean class="org.springframework.mobile.device.site.SitePreferenceHandlerInterceptor"/>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:exclude-mapping path="/admin/**" />
+			<mvc:exclude-mapping path="/login-proc" />
+			<mvc:exclude-mapping path="/member/phone-auth-req" />
+			<mvc:exclude-mapping path="/member/phone-auth-check" />
+			<mvc:exclude-mapping path="/member/vote/vote-list" />
+			<mvc:exclude-mapping path="/member/vote/savetemp" />
+			<mvc:exclude-mapping path="/member/vote/save" />
+			<bean class="org.springframework.mobile.device.switcher.SiteSwitcherHandlerInterceptor" factory-method="urlPath">
+				<constructor-arg index="0" type="java.lang.String" value="/m" />
+			</bean>
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/**/*" />
+			
+			<mvc:exclude-mapping path="/admin/**" />
+			<mvc:exclude-mapping path="/public/**" />
+			
+			<mvc:exclude-mapping path="/main" />
+			<mvc:exclude-mapping path="/login" />
+			<mvc:exclude-mapping path="/login-proc" />
+			<mvc:exclude-mapping path="/logout" />
+			<mvc:exclude-mapping path="/resources/**" />
+			
+			<mvc:exclude-mapping path="/member/join-step1" />
+			<mvc:exclude-mapping path="/member/terms-agree" />
+			<mvc:exclude-mapping path="/visitor/join-step1" />
+            <mvc:exclude-mapping path="/visitor/terms-agree" />
+			
+			<mvc:exclude-mapping path="/member/join-step2" />
+			<mvc:exclude-mapping path="/member/phone-auth-req" />
+			<mvc:exclude-mapping path="/member/phone-auth-check" />
+			<mvc:exclude-mapping path="/visitor/join-step2" />
+            <mvc:exclude-mapping path="/visitor/phone-auth-req" />
+            <mvc:exclude-mapping path="/visitor/phone-auth-check" />
+			
+			<mvc:exclude-mapping path="/member/join-step3" />
+			<mvc:exclude-mapping path="/member/check-email" />
+			<mvc:exclude-mapping path="/member/user-info-reg" />
+			
+			<mvc:exclude-mapping path="/member/join-step4" />
+			<mvc:exclude-mapping path="/member/base-info-reg" />
+			<mvc:exclude-mapping path="/visitor/join-step3" />
+            <mvc:exclude-mapping path="/visitor/base-info-reg" />
+			
+			<mvc:exclude-mapping path="/file-upload" />
+			<mvc:exclude-mapping path="/file-download/*" />
+			
+			<mvc:exclude-mapping path="/sample/**" />
+
+			<bean class="com.jaha.evote.common.interceptor.SessionCheckInterceptor">
+			</bean>				
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/admin/**" />
+			<mvc:exclude-mapping path="/admin/login" />
+			<mvc:exclude-mapping path="/admin/login-proc" />
+			<mvc:exclude-mapping path="/admin/logout" />
+			<bean class="com.jaha.evote.common.interceptor.AdminSessionCheckInterceptor">
+			</bean>				
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+</beans>

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.BusinessMapper">
+ 	
+	<!-- 사업현황 개수 -->
+	<select id = "selectBusinessListCount" parameterType="HashMap" resultType="int">	
+		/* businessListCount */
+		SELECT 	  count(*)
+			FROM biz_state a
+
+			WHERE site_cd = #{site_cd} AND del_yn= 'N'
+
+			<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(search_year)">
+				AND  biz_year = #{search_year}
+			</if>
+			<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(search_status)">
+				AND  a.state LIKE CONCAT('%',#{search_status},'%') 
+			</if>
+			<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(search_gubun) and @com.jaha.evote.common.util.StringUtils@isNotEmpty(search_string)">
+				<if test="@com.jaha.evote.common.util.StringUtils@equals(search_gubun, 'TITLE')">
+					AND  a.biz_name LIKE CONCAT('%',#{search_string},'%') 
+				</if>
+				<if test="@com.jaha.evote.common.util.StringUtils@equals(search_gubun, 'CONTENTS')">
+					AND  a.summary LIKE CONCAT('%',#{search_string},'%') 
+				</if>
+			</if>
+				
+	</select>
+	
+	<select id = "selectBusinessList" parameterType="HashMap" resultType="HashMap">
+		/* selectBusinessList */
+		SELECT biz_seq
+				, site_cd
+				, biz_year
+				, biz_name
+				, budget
+				, state
+				, progress
+				, summary
+				, plan
+				, result
+				, schedule
+				, dept
+				, reg_user
+				, reg_date
+				, mod_user
+				, mod_user
+				, (SELECT COUNT(*) FROM  biz_state_sympathy AS b WHERE b.biz_seq = a.biz_seq) as sympathyCnt  
+				, (SELECT
+						 c.file_seq   
+				   FROM 
+				   		file_info AS c
+	      		  WHERE
+	                c.file_grp_type = 'BUSINESS'
+	                AND c.file_type = 'IMAGE'
+	                AND c.delete_yn='N'
+	                AND c.file_grp_seq = a.biz_seq 
+	                		order by c.file_seq asc limit 1) AS fileSeq
+		 FROM biz_state AS a
+		
+		WHERE site_cd = #{site_cd} AND del_yn= 'N'
+
+				<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(search_year)">
+					AND  biz_year = #{search_year}
+				</if>
+				<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(search_status)">
+					AND  a.state LIKE CONCAT('%',#{search_status},'%') 
+				</if>
+				<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(search_gubun) and @com.jaha.evote.common.util.StringUtils@isNotEmpty(search_string)">
+					<if test="@com.jaha.evote.common.util.StringUtils@equals(search_gubun, 'TITLE')">
+						AND  a.biz_name LIKE CONCAT('%',#{search_string},'%') 
+					</if>
+					<if test="@com.jaha.evote.common.util.StringUtils@equals(search_gubun, 'CONTENTS')">
+						AND  a.summary LIKE CONCAT('%',#{search_string},'%') 
+					</if>
+				</if>
+
+				
+				Order by biz_seq desc
+	 	 LIMIT #{startNum}, #{endNum}
+	
+	</select>
+	
+	<select id = "selectBusinessListTop3"  resultType="HashMap">
+		/* selectBusinessListTop3 */
+		SELECT biz_seq
+				, site_cd
+				, biz_year
+				, biz_name
+				, budget
+				, state
+				, progress
+				, summary
+				, plan
+				, result
+				, schedule
+				, dept
+				, reg_user
+				, reg_date
+				, mod_user
+				, mod_user
+				, (SELECT COUNT(*) FROM  biz_state_sympathy AS b WHERE b.biz_seq = a.biz_seq) as sympathyCnt  
+				, (SELECT
+						 c.file_seq   
+				   FROM 
+				   		file_info AS c
+	      		  WHERE
+	                c.file_grp_type = 'BUSINESS'
+	                AND c.file_type = 'IMAGE'
+	                AND c.delete_yn='N'
+	                AND c.file_grp_seq = a.biz_seq 
+	                		order by c.file_seq asc limit 1) AS fileSeq
+		 FROM biz_state AS a
+		
+		WHERE site_cd = 'ep' AND del_yn= 'N'
+						Order by reg_date desc
+		 	 LIMIT 0, 3
+	
+	</select>
+	
+	
+	<select id = "selectBusiness" parameterType="HashMap" resultType="HashMap">
+		/* selectBusiness */
+		SELECT biz_seq
+				, site_cd
+				, biz_year
+				, biz_name
+				, budget
+				, state
+				, progress
+				, summary
+				, plan
+				, result
+				, schedule
+				, dept
+				, reg_user
+				, reg_date
+				, mod_user
+				, mod_user
+				, (SELECT COUNT(*) FROM  biz_state_sympathy AS b WHERE b.biz_seq = a.biz_seq) as sympathyCnt
+				,(SELECT 
+					b.biz_seq
+				  FROM 
+				  	biz_state_sympathy AS b 
+				 WHERE 
+				    b.biz_seq = a.biz_seq 
+				 AND b.user_seq = #{user_seq} ) as sympathy
+		 FROM biz_state as a
+		
+		WHERE site_cd = 'ep' AND del_yn= 'N' AND biz_seq = #{biz_seq}
+	
+	</select>
+	
+	
+	
+	<insert id="insertBusiness" parameterType="HashMap" useGeneratedKeys="true" keyColumn="biz_seq" keyProperty="biz_seq">
+	    /* insertBusiness */
+		INSERT INTO biz_state 
+		(
+			site_cd, 
+			biz_year,
+			biz_name,
+			budget,
+			state,
+			progress,
+			summary,
+			plan, 
+			result,
+			schedule, 
+			dept,
+			del_yn, 
+			reg_user, 
+			reg_date
+		 )
+		 VALUES 
+		 (
+				ifnull(#{site_code}, 'ep'),
+				#{biz_year},
+				#{biz_name},
+				#{budget},
+				#{state},
+				ifnull(#{progress},100),   
+				#{summary},
+				#{plan},
+				#{result},
+				#{schedule},
+				#{dept},
+				'N',
+				#{reg_user},
+				now()
+		 )
+	</insert>
+	
+	<update id="updateBusiness" parameterType="HashMap">
+    /* updateBusiness */
+	UPDATE biz_state 
+	SET
+		<if test="biz_year != null and biz_year != ''" >
+			biz_year = #{biz_year},
+		</if>
+		<if test="biz_name != null and biz_name != ''" >
+			biz_name = #{biz_name}, 
+		</if>
+		<if test="budget  != null and budget  != ''" >
+			budget = #{budget},
+		</if>
+		<if test="state != null and state != ''" >
+			state = #{state},
+		</if>
+		<if test="progress != null and progress != ''" >
+			progress = #{progress},
+		</if>
+		<if test="summary != null and summary != ''" >
+			summary = #{summary},
+		</if>
+		<if test="plan != null and plan != ''" >
+			plan = #{plan},
+		</if>
+		<if test="result != null and result != ''" >
+			result = #{result},
+		</if>
+		<if test="schedule != null and schedule != ''" >
+			schedule = #{schedule}, 
+		</if>
+		<if test="dept != null and dept != ''" >
+			dept =	#{dept},
+		</if>
+		mod_user = #{mod_user}, 
+		mod_date =now()
+		
+		WHERE biz_seq = ${biz_seq}
+	</update>
+	
+	<update id="deleteBusiness" parameterType="int">
+    	/* deleteBusiness */
+		UPDATE biz_state 
+			SET del_yn = 'Y'
+		WHERE biz_seq = #{biz_seq}
+	
+	</update>
+	
+	
+	
+	<insert id="insertSympathy" parameterType="HashMap">
+	    /* insertSympathy */
+		INSERT INTO biz_state_sympathy 
+		(
+			biz_seq, 
+			user_seq,
+			reg_date
+		 )
+		 VALUES 
+		 (
+				#{biz_seq},
+				#{user_seq},
+				now()
+		 )
+	</insert>
+	
+	<delete id="deleteSympathy" parameterType="HashMap">
+    	/* deleteSympathy */
+        DELETE FROM biz_state_sympathy
+        WHERE biz_seq = #{biz_seq}
+        AND user_seq = #{user_seq}
+	</delete>
+	
+</mapper>

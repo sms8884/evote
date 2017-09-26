@@ -1,0 +1,217 @@
+@charset "utf-8";
+@import url('../../css/base.css');
+@import url('layout.css');
+
+
+div#header.etc							{ width:100%; height:52px; position:relative; }
+
+ul.loginTab									{ height:45px; width:100%; display:inline-block; }
+ul.loginTab li									{ width:50%; height:45px; float:left; }
+ul.loginTab li a								{ display:block; height:43px; line-height:43px; background:#f0f0f0; border:1px solid #e6e6e6; text-align:center; font-size:16px; color:#8f8f8f; font-weight:bold; }
+ul.loginTab li a.on							{ border:1px solid #fff; border-top:1px solid #e6e6e6; background:#fff; color:#343434; }
+
+
+div.loginArea								{ padding:20px 11px; }
+div.loginArea p.login1					{ display:block; border:1px solid #d4d4d4; height:41px; }
+div.loginArea p.login1 input			{ width:100%; height:41px; line-height:41px; border:0; }
+div.loginArea p.login1:first-child	{ margin:0 0 10px; }
+div.loginArea p.login1 input.id		{ background:url(../img/etc/idBg.png) 98% 50% no-repeat; background-size:17.5px 13px; }
+div.loginArea p.login1 input.pw	{ background:url(../img/etc/pwBg.png) 97.8% 50% no-repeat; background-size:12.5px 16.5px; }
+
+div.loginArea p.login2					{ height:41px; padding:0 99px 0 0; position:relative; }
+div.loginArea p.login2:first-child	{ margin:0 0 10px; }
+div.loginArea p.login2 span			{ display:block; border:1px solid #d4d4d4; height:41px; }
+div.loginArea p.login2 span input				{ width:100%; height:41px; line-height:41px; border:0; }
+div.loginArea p.login2 a				{ position:absolute; top:0; right:0; height:41px; line-height:41px; width:92px; font-size:12px; text-align:center; }
+div.loginArea p.login2 a.bt1			{ border:1px solid #393d4c; color:#393d4c; }
+div.loginArea p.login2 a.bt2			{ border:1px solid #1278e1; background:#1278e1; color:#fff; }
+div.loginArea p.time						{ padding:8px 0 0; color:#ff6b56; font-size:12px; }
+
+div.memberArea								{ margin:20px 11px 50px; border-top:1px solid #d4d4d4; padding:16px 0 0; }
+div.memberArea ul							{ width:100%; display:inline-block; }
+div.memberArea ul li							{ float:left; width:33.333333%; }
+div.memberArea ul li a						{ display:block; text-align:center; font-size:12px; color:#8f8f8f; font-weight:bold; padding:40px 0 0; }
+div.memberArea ul li a.mbg1			{ background:url(../img/etc/loginMbg1.png) 50% 0 no-repeat; background-size:27px 31px; }
+div.memberArea ul li a.mbg2			{ background:url(../img/etc/loginMbg2.png) 50% 0 no-repeat; background-size:25px 32px; }
+div.memberArea ul li a.mbg3			{ background:url(../img/etc/loginMbg3.png) 50% 0 no-repeat; background-size:30px 31px; color:#1278e1;  }
+
+
+
+/*member*/
+div.memberBox								{ min-height:410px}
+div.memberTitle							{ padding:20px 11px; background:#f7f7f7; border-top:1px solid #e6e6e6; border-bottom:1px solid #e6e6e6; text-align:center; font-size:13px; color:#8f8f8f;  line-height:1.5;}
+a.blueUnder									{text-decoration:underline; color:#1278e1; }
+div.memberSelBox							{text-align:center; padding:25px 0;}
+ul.memberSel								{ overflow:hidden; width:100%; }
+ul.memberSel li								{ float:left; width:35%; padding:4% 5%; border:1px solid #e6e6e6; margin:0 2%;  text-align:center; }
+ul.memberSel li:hover					{ background:#f3f3f3; }
+ul.memberSel li strong					{ font-size:13px; color:#343434; display:block; padding:0 0 90px; }
+ul.memberSel li strong.pb			{ background:url(../img/etc/pb.png) 50% 44px no-repeat; background-size:26px }
+ul.memberSel li strong.eb			{ background:url(../img/etc/eb.png) 50% 50px no-repeat; background-size:31px }
+ul.memberSel li .bluebtn							{ display:block; width:100%; height:30px; line-height:30px; color:#fff; background:#1278e1; font-size:13px; border:none; }
+ul.memberSel li .bluebtn:hover				{ background:#393d4c; text-decoration:none; }
+
+
+
+div#div-join-step1							{background:#f7f7f7;  min-height:460px;}
+p.memberTit									{ font-size:16px; color:#1278e1; height:42px; line-height:42px; text-align:center; border-top:1px solid #e6e6e6; border-bottom:1px solid #e6e6e6; background:#fff;}
+ul.memberStep								{ width:100%; height:61px; border-bottom:1px solid #e6e6e6; display:inline-block; background:#fff;}
+ul.memberStep li							{ float:left; width:25%; height:59px; padding:0 0 2px; }
+ul.memberStep.memberStep2 li	{ float:left; width:33.333333%; height:59px; padding:0 0 2px; }
+ul.memberStep.memberStep3 li	{ float:left; width:50%; height:59px; padding:0 0 2px; }
+ul.memberStep li>span				{ padding:0 6px 0 0; display:block; height:59px; background:url(../img/etc/stepArr_off.png) 100% 50% no-repeat; background-size:6px 10.5px; }
+ul.memberStep.memberStep3 li.step2>span { background:none; }
+ul.memberStep.memberStep3 li.step2.on>span { background:none; }
+ul.memberStep li.step4>span			{ background:none; }
+ul.memberStep li.step4.on>span		{ background:none; }
+ul.memberStep li>span>span		{ display:block; padding:37px 0 0; height:22px; text-align:center; color:#8f8f8f; font-size:11px; font-weight:bold; }
+ul.memberStep li.step1>span>span			{ background:url(../img/etc/step1_off.png) 50% 12px no-repeat; background-size:16px 18.5px; }
+ul.memberStep li.step2>span>span			{ background:url(../img/etc/step2_off.png) 50% 12px no-repeat; background-size:14px 20.5px; }
+ul.memberStep li.step3>span>span			{ background:url(../img/etc/step3_off.png) 50% 12px no-repeat; background-size:17px 18.5px; }
+ul.memberStep li.step4>span>span			{ background:url(../img/etc/step4_off.png) 50% 12px no-repeat; background-size:19.5px 18.5px; }
+
+ul.memberStep li.on						{ padding:0; border-bottom:2px solid #343434; }
+ul.memberStep li.on>span			{ background:url(../img/etc/stepArr_on.png) 100% 50% no-repeat; background-size:6px 10.5px; }
+ul.memberStep li.on>span>span						{ color:#343434; }
+ul.memberStep li.step1.on>span>span			{ background:url(../img/etc/step1_on.png) 50% 12px no-repeat; background-size:16px 18.5px; }
+ul.memberStep li.step2.on>span>span			{ background:url(../img/etc/step2_on.png) 50% 12px no-repeat; background-size:14px 20.5px; }
+ul.memberStep li.step3.on>span>span			{ background:url(../img/etc/step3_on.png) 50% 12px no-repeat; background-size:17px 18.5px; }
+ul.memberStep li.step4.on>span>span			{ background:url(../img/etc/step4_on.png) 50% 12px no-repeat; background-size:19.5px 18.5px; }
+
+
+p.allChk										{ padding:20px 11px; background:#f7f7f7; }
+p.allChk a										{ display:block; padding:2px 0 0 25px; height:17px; line-height:17px; background:url(../img/etc/chk_off.png) 0 0 no-repeat; background-size:18px 17px; font-size:14px; color:#2a2a2a; font-weight:bold; }
+p.allChk span								{ display:block; padding:4px 0 0 25px; font-size:13px; color:#8f8f8f; line-height:140%; }
+p.allChk a.on								{ background:url(../img/etc/chk_on.png) 0 0 no-repeat; background-size:18px 17px; }
+
+ul.chkArea									{ background:#fff; border:1px solid #e6e6e6; padding:15px 10px; }
+ul.chkArea li									{ height:35px; position:relative; }
+ul.chkArea li a.chk						{ display:inline-block; height:35px; line-height:35px; padding:2px 0 0 25px; background:url(../img/etc/chk_off.png) 0 50% no-repeat; background-size:18px 17px; font-size:14px; color:#2a2a2a; font-weight:bold; }
+ul.chkArea li a.chk.on					{ background:url(../img/etc/chk_on.png) 0 50% no-repeat; background-size:18px 17px; }
+ul.chkArea li a.chk span				{ display:inline-block; height:35px; line-height:35px; font-size:14px; color:#999; }
+
+ul.chkArea li a.more						{ position:absolute; top:0; right:0; height:35px; line-height:35px; font-size:12px; color:#2a2a2a; font-weight:bold; background:url(../img/etc/moreArr.png) 100% 46% no-repeat; background-size:4.5px 7px; padding:0 12px 0 0; }
+
+
+div.memeberNext							{ background:#f7f7f7; padding:15px 11px 20px; text-align:center; }
+div.memeberNext a.next				{ border:1px solid #393d4c; background:#fff; text-align:center; height:36px; line-height:36px; display:block; font-size:13px; color:#393d4c; }
+div.memeberNext a.phoneMember		{ font-size:14px; color:#2a2a2a; font-weight:bold; display:inline-block; text-decoration:underline; margin:14px 0 0; }
+
+
+div.phoneArea												{ background:#f7f7f7; padding:0 11px; min-height:460px;}
+div.phoneArea p.tit										{ font-size:13px; color:#2a2a2a; font-weight:bold; padding:20px 0 8px; }
+div.phoneArea div.birth								{ width:100%; display:inline-block; }
+div.phoneArea div.birth p.sel						{ width:100%; display:inline-block; }
+div.phoneArea div.birth p.sel select				{ float:left; height:41px; line-height:41px; border:1px solid #d4d4d4; margin:0 0 0 1%; }
+div.phoneArea div.birth p.sel select:first-child			{ margin:0; }
+div.phoneArea div.birth p.sel select.sel1		{ width:50% }
+div.phoneArea div.birth p.sel select.sel2		{ width:24% }
+div.phoneArea div.birth p.sel select.sel3		{ width:24%; }
+div.phoneArea p.point									{ padding:8px 0 0; color:#ff6b56; font-size:12px; }
+
+div.phoneArea div.login								{ padding:20px 0; }
+div.phoneArea div.login p.login2					{ height:41px; padding:0 99px 0 0; position:relative; }
+div.phoneArea div.login p.login2:first-child	{ margin:0 0 10px; }
+div.phoneArea div.login p.login2 span			{ display:block; border:1px solid #d4d4d4; height:41px; }
+div.phoneArea div.login p.login2 span input				{ width:100%; height:41px; line-height:41px; border:0; }
+div.phoneArea div.login p.login2 a				{ position:absolute; top:0; right:0; height:41px; line-height:41px; width:92px; font-size:12px; text-align:center; }
+div.phoneArea div.login p.login2 a.bt1			{ border:1px solid #393d4c; color:#393d4c; }
+div.phoneArea div.login p.login2 a.bt2			{ border:1px solid #1278e1; background:#1278e1; color:#fff; }
+div.phoneArea div.login p.time						{ padding:8px 0 0; color:#ff6b56; font-size:12px; }
+div.phoneArea a.next				{ border:1px solid #393d4c; background:#fff; text-align:center; height:36px; line-height:36px; display:block; font-size:13px; color:#393d4c; margin:12px 0 0; }
+
+
+div.member3step											{ background:#f7f7f7; padding:0 11px; }
+div.member3step p.txt									{ font-size:13px; color:#8f8f8f; padding:20px 0; text-align:center; line-height:140%; border-bottom:1px solid #d4d4d4; }
+div.member3step div.memb							{ padding:20px 0 0; }
+div.member3step div.memb p.tit					{ font-size:13px; color:#2a2a2a; font-weight:bold; padding:0 0 8px; }
+div.member3step p.login2							{ height:41px; padding:0 99px 0 0; position:relative; }
+div.member3step p.login2 span					{ display:block; border:1px solid #d4d4d4; height:41px; }
+div.member3step p.login2 span input			{ width:100%; height:41px; line-height:41px; border:0; }
+div.member3step p.login2 a							{ position:absolute; top:0; right:0; height:41px; line-height:41px; width:92px; font-size:12px; text-align:center; }
+div.member3step p.login2 a.bt2					{ border:1px solid #1278e1; background:#1278e1; color:#fff; }
+
+div.member3step p.login1							{ display:block; border:1px solid #d4d4d4; height:41px; }
+div.member3step p.login1.login1bn	 			{ border-bottom:0; }
+div.member3step p.login1 input					{ width:100%; height:41px; line-height:41px; border:0; }
+
+div.member3step a.next								{ border:1px solid #393d4c; background:#fff; text-align:center; height:36px; line-height:36px; display:block; font-size:13px; color:#393d4c; margin:15px 0; }
+
+div#div_idinquiry1										{background:#f7f7f7; padding:0 11px; min-height:460px;}
+div#div_pwinquiry1									{background:#f7f7f7; padding:0 11px; min-height:460px;}
+div.member4step											{ background:#f7f7f7; padding:0 11px; }
+div.member4step p.txt									{ font-size:13px; color:#8f8f8f; padding:20px 0; text-align:center; line-height:140%; border-bottom:1px solid #d4d4d4; }
+div.member4step div.memb							{ padding:20px 0 0; }
+div.member4step div.memb p.tit					{ font-size:13px; color:#2a2a2a; font-weight:bold; padding:0 0 8px; }
+div.member4step p.login2							{ height:41px; padding:0 99px 0 0; position:relative; }
+div.member4step p.login2 span					{ display:block; border:1px solid #d4d4d4; height:41px; }
+div.member4step p.login2 span input			{ width:100%; height:41px; line-height:41px; border:0; }
+div.member4step p.login2 a							{ position:absolute; top:0; right:0; height:41px; line-height:41px; width:92px; font-size:12px; text-align:center; }
+div.member4step p.login2 a.bt2					{ border:1px solid #1278e1; background:#1278e1; color:#fff; }
+
+div.member4step p.login1							{ display:block; border:1px solid #d4d4d4; height:41px; }
+div.member4step p.login1.login1bn	 			{ border-bottom:0; }
+div.member4step p.login1 input					{ width:100%; height:41px; line-height:41px; border:0; }
+
+div.member4step p.area								{ height:41px; padding:0 0 0 127px; position:relative; }
+div.member4step p.area span						{ position:absolute; top:0; left:0; height:39px; line-height:39px; width:124px; font-size:12px; text-align:center; border:1px solid #d4d4d4; background:#f0f0f0; }
+div.member4step p.area select					{ width:100%; height:41px; line-height:41px; }
+span.infospan select					{ width:50%; height:41px; line-height:41px; font-size:13px; margin-left:5px}
+
+div.member4step p.gender					{ width:100%; height:41px; display:inline-block; }
+div.member4step p.gender a				{ width:50%; float:left; height:41px; }
+div.member4step p.gender a span				{ display:block; height:39px; border:1px solid #d4d4d4; text-align:center; color:#8f8f8f; line-height:41px; font-size:13px; background:#fff; }
+div.member4step p.gender a.on span			{ background:#8f8f8f; color:#fff; height:39px; line-height:41px; }
+
+
+
+
+div.more2											{ position:absolute; top:13px; right:10px; z-index:9; }
+div.more2 img									{ width:4px; }
+div.more2 ul										{ width:84px; border:1px solid #343434; position:absolute; top:0; right:15.5px; background:#fff; display:none; }
+div.more2 ul li										{ height:30px; }
+div.more2 ul li.fir									{ border-bottom:1px solid #e6e6e6; }
+div.more2 ul li a									{ display:block; height:30px; line-height:30px; text-align:center; font-size:12px; }
+
+
+p.gender					{ width:100%; height:41px; display:inline-block; }
+p.gender a				{ width:50%; float:left; height:41px; }
+p.gender a span				{ display:block; height:41px; text-align:center; color:#fff; line-height:41px; font-size:13px; background:#8f8f8f; }
+p.gender a.on span			{ border:1px solid #d4d4d4; background:#fff; color:#8f8f8f; height:39px; line-height:39px; }
+p.gender a:hover {text-decoration:none;}
+p.infoBt												{ padding:18px 0 9px; background:#f7f7f7; }
+
+div.infoChk											{ padding:20px 11px; }
+ul.chkArea										{ background:#fff; border:1px solid #e6e6e6; padding:15px 10px; }
+div.infoChk p									{ height:35px; position:relative; }
+div.infoChk p a.chk							{ display:inline-block; height:35px; line-height:35px; padding:2px 0 0 25px; background:url(../img/etc/chk_off.png) 0 50% no-repeat; background-size:18px 17px; font-size:14px; color:#2a2a2a; font-weight:bold; }
+div.infoChk p a.chk.on						{ background:url(../img/etc/chk_on.png) 0 50% no-repeat; background-size:18px 17px; }
+div.infoChk p a.chk span					{ display:inline-block; height:35px; line-height:35px; font-size:14px; color:#999; }
+div.infoChk p a.more						{ position:absolute; top:0; right:0; height:35px; line-height:35px; font-size:12px; color:#2a2a2a; font-weight:bold; background:url(../img/etc/moreArr.png) 100% 46% no-repeat; background-size:4.5px 7px; padding:0 12px 0 0; }
+
+div.chkScr											{ border:1px solid #e6e6e6; }
+div.chkScr p.tit									{ height:34px; line-height:34px; background:#f7f7f7; font-size:14px; color:#2a2a2a; padding:0 10px; font-weight:bold; }
+div.chkScr p.tit span							{ color:#999; height:34px; line-height:34px; display:inline-block; font-size:14px; }
+div.chkScr div.cont							{ height:120px; padding:10px; overflow:auto; font-size:13px; color:#8f8f8f; line-height:140%; }
+
+a.loginBt												{ height:39px; line-height:39px; background:#1278e1; font-size:13px; color:#fff; font-weight:bold; text-align:center; display:block; margin:0 11px; }
+
+a.loginBt.loginBt2									{ margin:15px 0; }
+
+a.closeBtw											{ height:38px; line-height:38px; background:#fff; font-size:13px; color:#393d4c; font-weight:bold; text-align:center; display:block; margin:0 11px; border:1px solid #393d4c; margin:9px 11px; }
+
+a.pwChangeBt												{ height:39px; line-height:39px; background:#1278e1; font-size:13px; color:#fff; font-weight:bold; text-align:center; display:block; margin:0 11px; }
+a.infoChangeBt										{ height:38px; line-height:38px; background:#fff; font-size:13px; color:#393d4c; font-weight:bold; text-align:center; display:block; margin:0 11px; border:1px solid #393d4c; margin:9px 11px; }
+
+
+div.access										{ padding:11px 11px 30px; font-size:14px; color:#343434; line-height:140%; border-top:1px solid #e6e6e6; }
+
+td.tdBox{overflow:hidden;}
+td.tdBox span{ line-height:40px;}
+
+td.tdBox a.bt1 {float:right; border: 1px solid #393d4c; color: #393d4c; line-height:40px;width: 92px;height: 40px;font-size: 12px; text-align: center; }
+
+/* 
+input, textarea, button {-webkit-appearance:none; -moz-appearance:none; appearance:none;}
+input, textarea, button, select {-webkit-border-radius:0; -moz-border-radius:0; -o-border-radius:0; border-radius:0;}
+ */

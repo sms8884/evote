@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.BoardMapper">
+ 	
+	<sql id="SQL_SELECT_BOARD">
+		SELECT board_seq,
+		       board_name,
+		       board_type,
+		       board_title,
+		       attach_use_yn,
+		       image_use_yn,
+		       max_attach_count,
+		       max_image_count,
+		       reply_use_yn,
+		       comment_use_yn,
+		       top_use_yn,
+		       cate_use_yn,
+		       push_use_yn,
+		       sec_use_yn,
+		       editor_use_yn,
+		       write_role,
+		       reg_date,
+		       reg_user,
+		       mod_date,
+		       mod_user
+		  FROM board
+	</sql>
+	
+	<sql id="SQL_SELECT_BOARD_POST">
+		SELECT post_seq,
+		       board_seq,
+		       category_cd,
+		       (select category_nm from board_category c where c.board_seq = post.board_seq AND c.category_cd = post.category_cd) AS category_nm,
+		       site_cd,
+		       parent_seq,
+		       level,
+		       title,
+		       cont,
+		       read_cnt,
+		       push_send_yn,
+		       push_send_date,
+		       dp_yn,
+		       del_yn,
+		       top_yn,
+		       hide_yn,
+		       sec_yn,
+		       password,
+		       append1,
+		       append2,
+		       append3,
+		       append4,
+		       append5,
+		       reply_date,
+		       reg_date,
+		       reg_user,
+		       CASE
+		          WHEN reg_user &gt; 9000000000
+		          THEN
+		             (SELECT mgr_nm
+		                FROM manager_mst
+		               WHERE mgr_seq = reg_user)
+		          WHEN reg_user &lt; 9000000000
+		          THEN
+		             (SELECT user_nm
+		                FROM member_mst
+		               WHERE user_seq = reg_user)
+		       END
+		          AS reg_user_nm,
+		       CASE
+		          WHEN reg_user &gt; 9000000000
+		          THEN
+		             (SELECT mgr_nickname
+		                FROM manager_mst
+		               WHERE mgr_seq = reg_user)
+		          WHEN reg_user &lt; 9000000000
+		          THEN
+		             (SELECT nickname
+		                FROM member_mst
+		               WHERE user_seq = reg_user)
+		       END
+		          AS reg_user_nickname,
+		       
+		       CASE WHEN reg_user > 0 and reg_user = #{regUser} THEN 'Y' ELSE 'N' END AS ownerYn,
+		       mod_date,
+		       mod_user
+		  FROM board_post post
+		 WHERE board_seq = #{boardSeq}
+		   AND site_cd = #{siteCd}
+		   AND del_yn = 'N'
+	</sql>
+
+	<sql id="SQL_SEARCH_BOARD_POST_LIST">
+
+		<if test='@com.jaha.evote.common.util.StringUtils@isEmpty(adminYn) or @com.jaha.evote.common.util.StringUtils@equals(adminYn, "N")'>
+		  AND dp_yn = 'Y'
+		</if>
+
+		<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(searchCategoryCd)">
+		  AND category_cd = #{searchCategoryCd}
+		</if>
+		<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(searchTarget) and @com.jaha.evote.common.util.StringUtils@isNotEmpty(searchText)">
+			<if test="@com.jaha.evote.common.util.StringUtils@equals(searchTarget, 'TITLE')">
+			  AND title LIKE CONCAT('%',#{searchText},'%')
+			</if>
+			<if test="@com.jaha.evote.common.util.StringUtils@equals(searchTarget, 'CONT')">
+			  AND cont LIKE CONCAT('%',#{searchText},'%')
+			</if>
+			<if test="@com.jaha.evote.common.util.StringUtils@equals(searchTarget, 'ALL')">
+			  AND (title LIKE CONCAT('%',#{searchText},'%') OR cont LIKE CONCAT('%',#{searchText},'%'))
+			</if>
+		</if>
+		<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(searchStartDate) and @com.jaha.evote.common.util.StringUtils@isNotEmpty(searchEndDate)">
+		<![CDATA[
+		  AND reg_date BETWEEN STR_TO_DATE(#{searchStartDate}, '%Y-%m-%d') AND DATE_ADD(STR_TO_DATE(#{searchEndDate}, '%Y-%m-%d'), INTERVAL 1 DAY)
+		]]>
+		</if>
+		
+		<if test='@com.jaha.evote.common.util.StringUtils@equals(searchMyPostYn, "Y")'>
+		  AND reg_user = #{regUser}
+		</if>
+
+		<if test='@com.jaha.evote.common.util.StringUtils@isNotEmpty(searchReplyYn)'>
+		  AND append4 = #{searchReplyYn}
+		</if>
+		
+	</sql>
+ 
+ 	<!-- 게시판 정보 조회 -->
+ 	<select id="selectBoardBySeq" resultType="board">
+ 		/* selectBoardBySeq */
+		<include refid="SQL_SELECT_BOARD" />
+		WHERE board_seq = #{boardSeq}
+	</select>
+
+	<!-- 게시판 정보 조회 -->
+ 	<select id="selectBoardByName" resultType="board">
+ 		/* selectBoardByName */
+		<include refid="SQL_SELECT_BOARD" />
+		WHERE board_name = #{boardName}
+	</select>
+
+	<!-- 게시판 카테고리 목록 조회 -->
+ 	<select id="selectBoardCategoryList" resultType="boardcategory">
+ 		/* selectBoardCategoryList */
+		SELECT board_seq,
+		       category_cd,
+		       category_nm,
+		       dp_ord,
+		       use_yn
+		  FROM board_category
+		 WHERE board_seq = #{boardSeq} 
+		   AND use_yn = 'Y'
+		ORDER BY dp_ord
+ 	</select>
+ 	
+	<!-- 게시물 카운트 -->
+	<select id="selectBoardPostListCount" parameterType="boardpost" resultType="int">
+		/* selectBoardPostListCount */
+		SELECT count(*)
+		  FROM board_post
+		 WHERE board_seq = #{boardSeq}
+		   AND del_yn = 'N'
+		   AND site_cd = #{siteCd}
+		 <include refid="SQL_SEARCH_BOARD_POST_LIST" />
+	</select>
+	
+ 	<!-- 게시물 목록 조회 -->
+	<select id="selectBoardPostList" parameterType="boardpost" resultType="boardpost">
+		/* selectBoardPostList */
+		<include refid="SQL_SELECT_BOARD_POST" />
+		<include refid="SQL_SEARCH_BOARD_POST_LIST" />
+		ORDER BY post_seq DESC
+		LIMIT #{startRow}, #{pagingRow}
+	</select>
+
+ 	<!-- 상단고정 게시물 목록 조회 -->
+	<select id="selectBoardTopList" parameterType="boardpost" resultType="boardpost">
+		/* selectBoardTopList */
+		<include refid="SQL_SELECT_BOARD_POST" />
+		<if test='@com.jaha.evote.common.util.StringUtils@isEmpty(adminYn) or @com.jaha.evote.common.util.StringUtils@equals(adminYn, "N")'>
+		  AND dp_yn = 'Y'
+		</if>
+		  AND top_yn = 'Y'
+		  ORDER BY board_seq DESC
+	</select>
+	
+	<!-- 게시물 조회수 증가 -->
+	<update id="updateBoardPostReadCount" parameterType="boardpost">
+		/* updateBoardPostReadCount */
+		UPDATE board_post
+		   SET read_cnt = ifnull(read_cnt, 0) + 1
+		 WHERE post_seq = #{postSeq}
+	</update>
+	
+	<!-- 게시물 상세 조회 -->
+	<select id="selectBoardPost" resultType="boardpost">
+		/* selectBoardPost */
+		<include refid="SQL_SELECT_BOARD_POST" />
+		  AND post_seq = #{postSeq}
+		<if test='@com.jaha.evote.common.util.StringUtils@isEmpty(adminYn) or @com.jaha.evote.common.util.StringUtils@equals(adminYn, "N")'>
+		  AND dp_yn = 'Y'
+		</if>
+	</select>
+
+	<!-- 이전 게시물 조회 -->
+	<select id="selectPrevBoardPost" parameterType="boardpost" resultType="boardpost">
+		/* selectPrevBoardPost */
+		<include refid="SQL_SELECT_BOARD_POST" />
+		  AND post_seq = (SELECT MIN(post_seq) 
+		                      FROM board_post 
+		                      WHERE post_seq &gt; #{postSeq}
+		                        AND board_seq = #{boardSeq} 
+		                        AND site_cd = #{siteCd} 
+		                        AND del_yn = 'N'
+							<if test='@com.jaha.evote.common.util.StringUtils@isEmpty(adminYn) or @com.jaha.evote.common.util.StringUtils@equals(adminYn, "N")'>
+							  AND dp_yn = 'Y'
+							</if>
+		                        )
+		<if test='@com.jaha.evote.common.util.StringUtils@isEmpty(adminYn) or @com.jaha.evote.common.util.StringUtils@equals(adminYn, "N")'>
+		  AND dp_yn = 'Y'
+		</if>
+	</select>
+
+	<!-- 다음 게시물 조회 -->
+	<select id="selectNextBoardPost" parameterType="boardpost" resultType="boardpost">
+		/* selectNextBoardPost */
+		<include refid="SQL_SELECT_BOARD_POST" />
+		  AND post_seq = (SELECT MAX(post_seq) 
+		                      FROM board_post 
+		                     WHERE post_seq &lt; #{postSeq} 
+		                       AND board_seq = #{boardSeq}
+		                       AND site_cd = #{siteCd} 
+		                       AND del_yn = 'N'
+							<if test='@com.jaha.evote.common.util.StringUtils@isEmpty(adminYn) or @com.jaha.evote.common.util.StringUtils@equals(adminYn, "N")'>
+							  AND dp_yn = 'Y'
+							</if>
+		                       )
+		<if test='@com.jaha.evote.common.util.StringUtils@isEmpty(adminYn) or @com.jaha.evote.common.util.StringUtils@equals(adminYn, "N")'>
+		  AND dp_yn = 'Y'
+		</if>
+	</select>
+
+	<!-- 이전 게시물 조회(검색조건 포함) -->
+	<select id="selectPrevBoardPostWithSearch" parameterType="boardpost" resultType="boardpost">
+		/* selectPrevBoardPostWithSearch */
+		<include refid="SQL_SELECT_BOARD_POST" />
+		  AND post_seq = (SELECT MIN(post_seq) FROM board_post <include refid="SQL_SEARCH_BOARD_POST_LIST" /> AND post_seq &gt; #{postSeq} AND board_seq = #{boardSeq} AND site_cd = #{siteCd} AND del_yn = 'N')
+		<if test='@com.jaha.evote.common.util.StringUtils@isEmpty(adminYn) or @com.jaha.evote.common.util.StringUtils@equals(adminYn, "N")'>
+		  AND dp_yn = 'Y'
+		</if>
+	</select>
+
+	<!-- 다음 게시물 조회(검색조건 포함) -->
+	<select id="selectNextBoardPostWithSearch" parameterType="boardpost" resultType="boardpost">
+		/* selectNextBoardPostWithSearch */
+		<include refid="SQL_SELECT_BOARD_POST" />
+		  AND post_seq = (SELECT MAX(post_seq) FROM board_post <include refid="SQL_SEARCH_BOARD_POST_LIST" /> AND post_seq &lt; #{postSeq} AND board_seq = #{boardSeq} AND site_cd = #{siteCd} AND del_yn = 'N')
+		<if test='@com.jaha.evote.common.util.StringUtils@isEmpty(adminYn) or @com.jaha.evote.common.util.StringUtils@equals(adminYn, "N")'>
+		  AND dp_yn = 'Y'
+		</if>
+	</select>
+
+	<!-- 게시물 등록 -->
+	<insert id="insertBoardPost" parameterType="boardpost" useGeneratedKeys="true" keyColumn="post_seq" keyProperty="postSeq">
+		/* insertBoardPost */
+		INSERT INTO board_post
+		(
+			board_seq,
+			category_cd,
+			site_cd,
+			parent_seq,
+			level,
+			title,
+			cont,
+			read_cnt,
+			push_send_yn,
+			push_send_date,
+			dp_yn,
+			del_yn,
+			top_yn,
+			hide_yn,
+			sec_yn,
+			password,
+			append1,
+			append2,
+			append3,
+			append4,
+			append5,
+			reg_date,
+			reg_user
+		)
+		VALUES 
+		(
+			#{boardSeq},
+			#{categoryCd},
+			#{siteCd},
+			#{parentSeq},
+			ifnull(#{level}, 1),
+			#{title},
+			#{cont},
+			0,
+			ifnull(#{pushSendYn}, 'N'),
+			#{pushSendDate},
+			ifnull(#{dpYn}, 'Y'),
+			'N',
+			ifnull(#{topYn}, 'N'),
+			ifnull(#{hideYn}, 'N'),
+			ifnull(#{secYn}, 'N'),
+			#{password},
+			#{append1},
+			#{append2},
+			#{append3},
+			#{append4},
+			#{append5},
+			now(),
+			#{regUser}
+		)
+	</insert>
+
+	<!-- 게시물 수정 -->
+	<update id="updateBoardPost" parameterType="boardpost">
+		/* updateBoardPost */
+		UPDATE board_post
+		   SET category_cd = #{categoryCd},
+		       title = #{title},
+		       cont = #{cont},
+			<if test='@com.jaha.evote.common.util.StringUtils@isEmpty(pushSendYn) and pushSendYn == "Y"'>
+		       push_send_yn = #{pushSendYn},
+		       push_send_date = now(),
+			</if>
+		       dp_yn = ifnull(#{dpYn}, 'Y'),
+		       top_yn = ifnull(#{topYn}, 'N'),
+			<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(hideYn)">
+		       hide_yn = #{hideYn},
+			</if>
+			<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(secYn)">
+		       sec_yn = #{secYn},
+			</if>
+			
+			<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(append1)">
+			   append1 = #{append1},
+			</if>
+			<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(append2)">
+			   append2 = #{append2},
+			</if>
+			<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(append3)">
+			   append3 = #{append3},
+			</if>
+			<if test='@com.jaha.evote.common.util.StringUtils@isNotEmpty(append4) and append4 == "Y"'>
+			   append4 = #{append4},
+			   reply_date = now(),
+			</if>
+			<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(append5)">
+			   append5 = #{append5},
+			</if>
+			   
+		       mod_date = now(),
+		       mod_user = #{modUser}
+		 WHERE post_seq = #{postSeq}
+	</update>
+
+	<!-- 게시물 삭제 -->
+	<update id="deleteBoardPost" parameterType="boardpost">
+		/* deleteBoardPost */
+		UPDATE board_post
+		   SET del_yn = 'Y',
+		       mod_date = now(),
+		       mod_user = #{modUser}
+		 WHERE post_seq = #{postSeq}
+	</update>
+
+	<!-- 푸시 발송 여부 수정 -->
+	<update id="updatePushSendResult" parameterType="boardpost">
+		/* updatePushSendResult */
+		UPDATE board_post
+		   SET push_send_yn = 'Y',
+		       push_send_date = now()
+		 WHERE post_seq = #{postSeq}
+	</update>
+
+	<!-- 최근 게시물 목록 조회 -->
+	<select id="selectRecentBoardPostList" resultType="boardpost">
+		/* selectRecentBoardPostList */
+		<include refid="SQL_SELECT_BOARD_POST" />
+		  AND dp_yn = 'Y'
+		  ORDER BY post_seq DESC
+		  LIMIT 0, #{postCount}
+	</select>
+
+	<!-- 게시물 숨김 여부 수정 -->
+	<update id="updateBoardPostHideYn" parameterType="map">
+		/* updateBoardPostHideYn */
+		UPDATE board_post
+		   SET hide_yn = #{hideYn},
+		       mod_date = now(),
+		       mod_user = #{modUser}
+		 WHERE post_seq = #{postSeq}
+	</update>
+	
+</mapper>

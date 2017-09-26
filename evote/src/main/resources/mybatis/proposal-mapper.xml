@@ -1,0 +1,888 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.ProposalMapper">
+
+    <!-- proposal basic sql -->
+    <sql id="sqlSelectProposal">
+        SELECT l1.prop_seq
+		      ,l1.ps_seq
+		      ,l1.site_cd
+		      ,l1.realm_cd
+		      ,(SELECT realm_nm FROM realm_mst WHERE realm_cd = l1.realm_cd AND site_cd = l1.site_cd) realm_nm
+		      ,l1.biz_nm
+		      ,l1.cnsl_yn
+		      ,l1.budget
+		      ,l1.start_date
+		      ,l1.end_date
+		      ,l1.location
+		      ,l1.necessity
+		      ,l1.biz_cont
+		      ,l1.effect
+		      ,l1.status
+		      <if test="statusCodeGroup != null and statusCodeGroup != ''">
+              ,( SELECT cd_nm FROM comm_cd WHERE cd_grp_id = #{statusCodeGroup} AND cd_id = l1.status ) status_text		      
+		      </if>
+		      ,l1.read_cnt
+		      ,(SELECT COUNT(*) FROM prop_sympathy WHERE prop_seq = l1.prop_seq) sym_cnt
+		      ,(SELECT COUNT(*) FROM prop_comment WHERE prop_seq = l1.prop_seq) comment_cnt		      
+		      ,l1.member_yn
+		      , ifnull(l1.req_nm, l2.user_nm) as req_nm		      
+		      , ifnull(l1.req_phone, l2.phone) as req_phone		      
+		      , ifnull(l1.req_addr, l2.emd_nm) as req_addr
+              , ifnull(l1.req_email, l2.email) as req_email	
+		      ,l1.req_pw
+		      ,l1.reg_date
+		      ,l1.reg_user
+		      ,l2.user_nm AS reg_name
+              ,l2.sgg_nm AS reg_sgg_nm
+              ,l2.emd_nm AS reg_emd_nm
+              ,l2.email AS reg_email             
+		      ,l1.mod_date
+		      ,l1.mod_user
+		      ,l3.review_result
+            <choose>
+                <when test="userSeq != null">
+		        ,case when (SELECT count(*) FROM prop_sympathy WHERE prop_seq = l1.prop_seq and user_seq = #{userSeq}) > 0  then 'Y' else 'N' end AS sym_yn
+		        ,case when (l1.reg_user = #{userSeq}) then 'Y' else 'N' end AS owner_yn
+		        ,ifnull((select cmt_yn from member_mst where user_seq = #{userSeq}), 'Y') AS cmt_yn
+                </when>
+                <otherwise>
+                , 'N' AS sym_yn
+                , 'N' AS owner_yn
+                , NULL AS cmt_yn
+                </otherwise>
+            </choose>           
+		FROM proposal l1
+		LEFT OUTER JOIN member_mst l2 ON l1.reg_user = l2.user_seq
+        LEFT OUTER JOIN prop_audit l3 ON l1.prop_seq = l3.prop_seq
+        WHERE l1.site_cd = #{siteCd}
+		    <if test="propSeq != null and propSeq != ''">
+                AND l1.prop_seq = #{propSeq}
+            </if>
+            <if test="psSeq != null and psSeq != ''">
+                AND ps_seq = #{psSeq}
+            </if>
+            <if test='isPs == "Y"'>
+                AND ps_seq is not null
+            </if>
+            <if test='isPs == "N"'>
+                AND ps_seq is null
+            </if>
+		    <if test="status != null and status != ''">
+		        AND l1.status = #{status}
+		    </if>
+		    <if test="searchKeyword != nul and searchKeyword != ''">
+                <if test="searchItem == 1">
+	                AND l1.biz_nm LIKE concat('%', #{searchKeyword}, '%')
+	            </if>
+	            <if test="searchItem == 2">
+	                AND l2.user_nm LIKE concat('%', #{searchKeyword}, '%')
+	            </if>		    
+	            <if test='searchColumn == "title"'>
+	                AND l1.biz_nm LIKE concat('%', #{searchKeyword}, '%')
+	            </if>	          
+	            <if test='searchColumn == "name"'>	        	      
+	                AND ( 1.req_nm LIKE concat('%', #{searchKeyword}, '%') OR l2.user_nm LIKE concat('%', #{searchKeyword}, '%') )
+	            </if>
+		    </if>
+		    <if test="bizNm != null and bizNm != ''">
+                    AND l1.biz_nm LIKE concat('%', #{bizNm}, '%')
+                </if>
+            <if test="realmCd != null and realmCd != ''">
+                AND l1.realmCd = #{realmCd}
+            </if>
+            <if test='deleteYn == "Y"'>
+                AND l1.delete_yn = 'Y'
+            </if>
+            <if test='deleteYn == "N"'>
+                AND (l1.delete_yn is null OR l1.delete_yn = 'N')
+            </if>
+            
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                AND date_format(l1.reg_date, '%Y-%m-%d') between #{startDate} AND #{endDate}
+            </if>
+            <if test="startDate != null and startDate != '' and (endDate == null or endDate == '')">
+                AND date_format(l1.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate}
+            </if>
+            <if test="(startDate == null or startDate == '') and endDate != null and endDate != ''">
+                AND date_format(l1.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate}
+            </if>
+            
+            <if test='myProposal == "Y"'>
+                AND l1.reg_user = #{userSeq}
+            </if>
+            
+            <if test='reviewResult == "Y"'>
+                AND l3.review_result = 'Y'
+            </if>
+            <if test='reviewResult == "N"'>
+                AND l3.review_result = 'N'
+            </if>
+            
+            <choose>
+                <when test="sortItem == 1">ORDER BY sym_cnt DESC, l1.reg_date DESC, l1.prop_seq DESC</when>
+                <when test="sortItem == 2">ORDER BY l1.read_cnt DESC, l1.reg_date DESC, l1.prop_seq DESC</when>
+                <otherwise>ORDER BY l1.reg_date DESC, l1.prop_seq DESC</otherwise>
+            </choose>
+            
+    </sql>
+    
+	<select id="selectMainProposalList" parameterType="String" resultType="proposal">
+		<bind name="_PROPOSAL_STATUS_PENDING" value="@com.jaha.evote.domain.type.ProposalStatus@PENDING" />
+		/* selectMainProposalList */
+		SELECT (SELECT realm_nm
+		          FROM realm_mst
+		         WHERE realm_cd = prop.realm_cd AND site_cd = prop.site_cd)
+		          realm_nm,
+		       prop.prop_seq,
+		       prop.site_cd,
+		       prop.biz_nm,
+		       prop.reg_date
+		  FROM proposal prop
+		 WHERE prop.site_cd = #{siteCd}
+		   AND prop.status = #{_PROPOSAL_STATUS_PENDING}
+		   AND prop.delete_yn = 'N'
+		ORDER BY prop.reg_date DESC
+		 LIMIT 0, 3
+	</select>
+	
+	<select id="selectProposalList" parameterType="map" resultType="proposal">
+	/* selectProposalList */
+	    <include refid="sqlSelectProposal" />
+	    LIMIT #{startNum}, #{endNum}
+	</select>
+	
+	
+	
+	<select id="selectProposalListCount" parameterType="map" resultType="int">
+	/* selectProposalListCount */
+		SELECT COUNT(*)
+		FROM (
+	        <include refid="sqlSelectProposal" />
+	    ) A
+    </select>
+	
+	<select id="selectProposal" parameterType="map" resultType="proposal">
+	/* selectProposal */
+        <include refid="sqlSelectProposal" />
+    </select>
+    
+    <insert id="saveProposal" parameterType="proposal" useGeneratedKeys="true" keyColumn="prop_seq" keyProperty="propSeq" >
+    /* saveProposal */
+        INSERT INTO proposal 
+        ( 
+            prop_seq,
+            ps_seq,
+            site_cd,
+            realm_cd, 
+            biz_nm,
+            cnsl_yn,
+            budget,
+            start_date,
+            end_date,
+            location,
+            necessity,
+            biz_cont,
+            effect,
+            status,
+            read_cnt,
+            member_yn,
+            req_nm,
+            req_phone,
+            req_addr,
+            req_email,
+            req_pw,
+            reg_date,
+            reg_user            
+        ) 
+        VALUES
+        (
+            #{propSeq},
+            #{psSeq},
+            #{siteCd},
+            #{realmCd},
+            #{bizNm},
+            #{cnslYn},
+            #{budget},
+            #{startDate},
+            #{endDate},
+            #{location},
+            #{necessity},
+            #{bizCont},
+            #{effect},
+            #{status},
+            #{readCnt},
+            #{memberYn},
+            #{reqNm},
+            #{reqPhone},
+            #{reqAddr},
+            #{reqEmail},
+            #{reqPw},
+            now(),
+            #{regUser}
+        )
+        ON DUPLICATE KEY UPDATE
+            ps_seq = #{psSeq},
+            realm_cd = #{realmCd}, 
+            biz_nm = #{bizNm},
+            cnsl_yn = #{cnslYn},
+            budget = #{budget},
+            start_date = #{startDate},
+            end_date = #{endDate},
+            location = #{location},
+            necessity = #{necessity},
+            biz_cont = #{bizCont},
+            effect = #{effect},
+            status = #{status},
+            read_cnt = #{readCnt},
+            member_yn = #{memberYn},
+            req_nm = #{reqNm},
+            req_phone = #{reqPhone},
+            req_addr = #{reqAddr},
+            req_email = #{reqEmail},
+            req_pw = #{reqPw},
+            mod_date = now(),
+            mod_user = #{regUser}
+    </insert>
+	
+	<update id="updateVisitorProposal" parameterType="proposal">
+		/* updateVisitorProposal */
+		UPDATE proposal
+	       SET realm_cd = #{realmCd}, 
+	           biz_nm = #{bizNm},
+	           cnsl_yn = #{cnslYn},
+	           budget = #{budget},
+	           start_date = #{startDate},
+	           end_date = #{endDate},
+	           location = #{location},
+	           necessity = #{necessity},
+	           biz_cont = #{bizCont},
+	           effect = #{effect},
+	           req_nm = #{reqNm},
+	           req_addr = #{reqAddr},
+	           req_email = #{reqEmail},
+	           mod_date = now(),
+	           mod_user = #{regUser}
+	           , ps_seq = #{psSeq}
+	     WHERE prop_seq = #{propSeq}
+	</update>
+	
+	<update id="updateProposalItem" parameterType="map" >
+	/* updateProposalItem */
+	   UPDATE proposal
+	   SET ${_column} = #{_data}
+	   <if test="_udpateUser != null and _udpateUser != ''">
+          ,mod_user = #{_udpateUser}
+          ,mod_date = now()	   
+	   </if>
+	   WHERE prop_seq = #{propSeq}
+	</update>
+
+	<update id="deleteProposal" parameterType="Map">
+	/* deleteProposal */
+	   UPDATE proposal
+	   SET delete_yn = 'Y',
+	       mod_user = #{userSeq},
+	       mod_date = now()	   
+	   WHERE prop_seq = #{propSeq}
+	</update>
+
+	<update id="deleteVisitorProposal" parameterType="Long">
+	/* deleteVisitorProposal */
+	   UPDATE proposal
+	   SET delete_yn = 'Y',
+	       mod_user = -1,
+	       mod_date = now()	   
+	   WHERE prop_seq = #{propSeq}
+	</update>
+	
+	<select id="selectSympathy" parameterType="map" resultType="map" >
+	/* selectSympathy */
+	    SELECT *
+        FROM prop_sympathy
+        WHERE prop_seq = #{propSeq}
+        AND user_seq = #{userSeq}
+	</select>
+	
+	<select id="selectSympathyCount" parameterType="map" resultType="int" >
+	/* selectSympathyCount */
+        SELECT count(*)
+        FROM prop_sympathy
+        WHERE prop_seq = #{propSeq}
+    </select>
+    
+    <insert id="insertSympathy" parameterType="map" >
+    /* insertSympathy */
+        INSERT INTO prop_sympathy
+        (
+            prop_seq
+           ,user_seq
+           ,reg_date
+        )
+        VALUES
+        (
+            #{propSeq}
+           ,#{userSeq}
+           ,now()
+        )
+    </insert>
+    
+    <delete id="deleteSympathy" parameterType="map">
+    /* deleteSympathy */
+        DELETE FROM prop_sympathy
+        WHERE prop_seq = #{propSeq}
+        AND user_seq = #{userSeq}
+    </delete>
+    
+    <sql id="sqlSelectComment">
+        SELECT l1.cmt_seq
+              ,l1.prop_seq
+              ,l1.cont
+              ,l1.hide_yn
+              ,( SELECT count(*) FROM prop_cmt_agree WHERE cmt_seq = l1.cmt_seq AND agree_yn = 'Y' ) agree_cnt_y
+              ,( SELECT count(*) FROM prop_cmt_agree WHERE cmt_seq = l1.cmt_seq AND agree_yn = 'N' ) agree_cnt_n
+              ,( SELECT count(*) FROM prop_cmt_report WHERE cmt_seq = l1.cmt_seq ) report_cnt
+              ,l1.reg_date
+              ,ifnull(l2.user_nm,l3.mgr_nm) AS reg_name
+              ,ifnull(l2.nickname,ifnull(l2.user_nm,l3.mgr_nm)) AS nickname
+              ,l1.reg_user
+              ,l1.mod_date
+              ,l1.mod_user
+              ,l2.cmt_yn
+            <choose>
+                <when test="userSeq != null">
+		        ,case when (reg_user = #{userSeq}) then 'Y' else 'N' end AS owner_yn
+                </when>
+                <otherwise>
+                , 'N' AS owner_yn
+                </otherwise>
+            </choose>
+        FROM prop_comment l1
+        LEFT OUTER JOIN member_mst l2
+        ON l1.reg_user = l2.user_seq
+        LEFT OUTER JOIN manager_mst l3
+        ON l1.reg_user = l3.mgr_seq
+    </sql>
+    
+    <select id="selectCommentList" parameterType="map" resultType="propcomment" >
+    /* selectCommentList */
+        <include refid="sqlSelectComment" />
+        WHERE l1.prop_seq = #{propSeq}
+        ORDER BY l1.reg_date ASC
+    </select>
+    
+    <select id="selectComment" parameterType="map" resultType="propcomment" >
+    /* selectComment */
+        <include refid="sqlSelectComment" />
+        WHERE l1.cmt_seq = #{cmtSeq}
+    </select>
+    
+    <insert id="saveComment" parameterType="propcomment">
+    /* saveComment */
+        INSERT INTO prop_comment 
+        ( 
+            cmt_seq,
+            prop_seq,
+            cont, 
+            hide_yn,
+            reg_date,
+            reg_user
+        ) 
+        VALUES
+        (
+            #{cmtSeq},
+            #{propSeq},
+            #{cont},
+            'N',
+            now(),
+            #{regUser}
+        )
+        ON DUPLICATE KEY UPDATE
+            cont = #{cont},
+            mod_date = now(),
+            mod_user = #{regUser}
+    </insert>
+    
+    <update id="hideComment" parameterType="map" >
+    /* hideComment */
+        UPDATE prop_comment
+        SET hide_yn = #{hideYn}
+        WHERE cmt_seq = #{cmtSeq}
+    </update>
+    
+    <delete id="deleteComment" parameterType="map" >
+    /* deleteComment */
+        DELETE FROM prop_comment WHERE cmt_seq = #{cmtSeq}
+    </delete>
+    
+    <delete id="deleteCommentAgree" parameterType="map" >
+    /* deleteCommentAgree */
+        DELETE FROM prop_cmt_agree WHERE cmt_seq = #{cmtSeq}
+    </delete>
+    
+    <delete id="deleteCommentReport" parameterType="map" >
+    /* deleteCommentReport */
+        DELETE FROM prop_cmt_report WHERE cmt_seq = #{cmtSeq}
+    </delete>
+    
+    <select id="selectCommentAgree" parameterType="map" resultType="map" >
+    /* selectCommentAgree */
+        SELECT *
+        FROM prop_cmt_agree
+        WHERE cmt_seq = #{cmtSeq}
+        AND user_seq = #{userSeq}
+    </select>
+    
+    <insert id="saveCommentAgree" parameterType="map">
+    /* saveCommentAgree */
+        INSERT INTO prop_cmt_agree
+        ( 
+            cmt_seq,
+            user_seq,
+            agree_yn,
+            reg_date
+        ) 
+        VALUES
+        (
+            #{cmtSeq},
+            #{userSeq},
+            #{agreeYn},
+            now()
+        )
+        ON DUPLICATE KEY UPDATE
+            agree_yn = #{agreeYn},
+            mod_date = now()
+    </insert>
+    
+    <select id="selectCommentReport" parameterType="map" resultType="map" >
+    /* selectCommentReport */
+        SELECT *
+        FROM prop_cmt_report
+        WHERE cmt_seq = #{cmtSeq}
+        AND user_seq = #{userSeq}
+    </select>
+    
+    <insert id="insertCommentReport" parameterType="map">
+    /* insertCommentReport */
+        INSERT INTO prop_cmt_report
+        ( 
+            cmt_seq,
+            user_seq,
+            reason,
+            reg_date,
+            reg_user
+        ) 
+        VALUES
+        (
+            #{cmtSeq},
+            (SELECT reg_user from prop_comment where cmt_seq = #{cmtSeq}),
+            #{reason},
+            now(),
+            #{userSeq}
+        )
+    </insert>
+    
+    <insert id="saveProposalAudit" parameterType="proposalaudit">
+    /* saveProposalAudit */
+        INSERT INTO prop_audit
+        ( 
+            prop_seq,
+            start_date,
+            end_date,
+            budget,
+            location,
+            subcmit,
+            biz_cont,
+            law_result,
+            law_detail,
+            review_result,
+            review_detail,
+            review_dept,
+            reviewer,
+            cmit_result,
+            cmit_detail,
+            audit_cmit_result,
+            audit_cmit_budget,
+            audit_gnr_result,
+            audit_gnr_budget,
+            audit_rank,
+            reg_date,
+            reg_user
+        ) 
+        VALUES
+        (
+            #{propSeq},
+            #{startDate},
+            #{endDate},
+            #{budget},
+            #{location},
+            #{subcmit},
+            #{bizCont},
+            #{lawResult},
+            #{lawDetail},
+            #{reviewResult},
+            #{reviewDetail},
+            #{reviewDept},
+            #{reviewer},
+            #{cmitResult},
+            #{cmitDetail},
+            #{auditCmitResult},
+            #{auditCmitBudget},
+            #{auditGnrResult},
+            #{auditGnrBudget},
+            #{auditRank},
+            now(),
+            #{regUser}
+        )
+        ON DUPLICATE KEY UPDATE
+            start_date = #{startDate},
+            end_date = #{endDate},
+            budget = #{budget},
+            location = #{location},
+            subcmit = #{subcmit},
+            biz_cont = #{bizCont},
+            law_result = #{lawResult},
+            law_detail = #{lawDetail},
+            review_result = #{reviewResult},
+            review_detail = #{reviewDetail},
+            review_dept = #{reviewDept},
+            reviewer = #{reviewer},
+            cmit_result = #{cmitResult},
+            cmit_detail = #{cmitDetail},
+            audit_cmit_result = #{auditCmitResult},
+            audit_cmit_budget = #{auditCmitBudget},
+            audit_gnr_result = #{auditGnrResult},
+            audit_gnr_budget = #{auditGnrBudget},
+            audit_rank = #{auditRank},
+            mod_date = now(),
+            mod_user = #{modUser}
+    </insert>
+    
+    <select id="selectProposalAudit" parameterType="map" resultType="proposalaudit" >
+    /* selectProposalAudit */
+        SELECT *, (select realm_nm from realm_mst where realm_cd = a.realm_cd and site_cd = 'ep') AS realm_nm
+        FROM prop_audit a
+        WHERE prop_seq = #{propSeq}
+    </select>
+    
+    <update id="saveProposalStatus" parameterType="proposalaudit" >
+        UPDATE proposal
+        SET status = #{status}
+        WHERE prop_seq = #{propSeq}
+    </update>
+    
+    <select id="selectProposalListExcel" parameterType="map" resultType="map">
+	/* selectProposalListExcel */
+	SELECT pro.prop_seq
+	       , pro.ps_seq
+	       , pro.site_cd
+	       , pro.realm_cd
+	       , (SELECT realm_nm FROM realm_mst WHERE realm_cd = pro.realm_cd AND site_cd = pro.site_cd) realm_nm
+	       , pro.biz_nm
+	       , pro.budget
+	       , date_format(pro.start_date, '%Y-%m-%d') as start_date
+	       , date_format(pro.end_date, '%Y-%m-%d') as end_date
+	       , pro.location
+	       , pro.necessity
+	       , pro.biz_cont
+	       , pro.effect
+	       , pro.status
+	       , pro.read_cnt
+	       , (SELECT COUNT(*) FROM prop_sympathy WHERE prop_seq = pro.prop_seq) sym_cnt
+	       , (SELECT COUNT(*) FROM prop_comment WHERE prop_seq = pro.prop_seq) comment_cnt		      
+	       , pro.member_yn
+	       , ifnull(pro.req_nm, mm.user_nm) AS reg_name
+	       , ifnull(pro.req_phone, mm.phone) as req_phone
+	       , pro.req_addr
+	       , pro.req_email
+	       , pro.req_pw
+	       , date_format(pro.reg_date, '%Y-%m-%d') as reg_date        
+	       , pro.reg_user
+	       , mm.sgg_nm AS reg_sgg_nm
+	       , mm.emd_nm AS reg_emd_nm
+	       , mm.email AS reg_email
+	       , pa.review_result
+	       , case when (SELECT count(fi.file_seq) FROM file_info fi WHERE fi.file_grp_seq = pro.prop_seq AND fi.file_grp_type = 'PROPOSAL' AND fi.file_type = 'ATTACH'  AND fi.delete_yn ='N') <![CDATA[ > ]]> 0  then 'Y' else 'N' end AS file_yn
+	FROM proposal pro
+	LEFT OUTER JOIN member_mst mm ON pro.reg_user = mm.user_seq
+	LEFT OUTER JOIN prop_audit pa ON pro.prop_seq = pa.prop_seq
+	WHERE pro.site_cd = #{siteCd}
+  		AND (pro.delete_yn is null OR pro.delete_yn = 'N')
+		<if test="propSeq != null and propSeq != ''">AND pro.prop_seq = #{propSeq}</if>
+		<if test="psSeq != null and psSeq != ''">AND ps_seq = #{psSeq}</if>
+		<if test='isPs == "Y"'>AND ps_seq is not null</if>
+		<if test='isPs == "N"'>AND ps_seq is null</if>
+		<if test="status != null and status != ''">AND pro.status = #{status}</if>
+		<if test="searchKeyword != nul and searchKeyword != ''">              
+	       <if test='searchColumn == "title"'>AND pro.biz_nm LIKE concat('%', #{searchKeyword}, '%')</if>	  
+	       <if test='searchColumn == "name"'>AND ( pro.req_nm LIKE concat('%', #{searchKeyword}, '%') OR mm.user_nm LIKE concat('%', #{searchKeyword}, '%') )</if>        
+		</if>
+		<if test="realmCd != null and realmCd != ''">AND pro.realmCd = #{realmCd}</if>
+		<if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+			AND date_format(pro.reg_date, '%Y-%m-%d') between #{startDate} AND #{endDate}
+		</if>
+		<if test="startDate != null and startDate != '' and (endDate == null or endDate == '')">
+			AND date_format(pro.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate}
+		</if>
+		<if test="(startDate == null or startDate == '') and endDate != null and endDate != ''">
+			AND date_format(pro.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate}
+		</if>            
+		<if test='reviewResult != null and reviewResult !=""'>AND pa.review_result = #{reviewResult}</if>
+		<choose>
+		    <when test="sortItem == 1">ORDER BY sym_cnt DESC, pro.reg_date DESC, pro.prop_seq DESC</when>
+		    <when test="sortItem == 2">ORDER BY pro.read_cnt DESC, pro.reg_date DESC, pro.prop_seq DESC</when>
+		    <otherwise>ORDER BY pro.reg_date DESC, pro.prop_seq DESC</otherwise>
+		</choose>
+	</select>
+	
+	<select id="selectPssrpList" parameterType="map" resultType="pssrp">
+		/* selectPssrpList */
+		SELECT ps_seq
+		       , site_cd
+		       , title
+		       , op_scale
+		       , gnr_scope
+		       , gnr_scale
+		       , gnr_std
+		       , trg_scope
+		       , trg_scale
+		       , trg_std
+		       , start_date
+		       , end_date
+		       , req_dest
+		       , req_realm
+		       , req_method
+		       , biz_scale
+		       , regulation
+		       , ineligible_biz
+		       , reg_date
+		       , reg_user
+		       , mod_date
+		       , mod_user
+		       , (select count(*) from proposal where a.ps_seq = ps_seq) as proposal_cnt
+		       <![CDATA[
+		       	, CASE WHEN (now() BETWEEN a.start_date AND a.end_date) THEN 'START' WHEN (a.start_date > now()) THEN 'WAIT' WHEN (a.end_date < now()) THEN 'END' END AS status 
+		       	]]>
+		FROM pssrp a
+		WHERE site_cd = #{siteCd}	
+			AND del_yn != 'Y'	
+			<if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+				AND (date_format(start_date, '%Y-%m-%d') <![CDATA[ < ]]> #{endDate}
+	 			AND date_format(end_date, '%Y-%m-%d') <![CDATA[>]]> #{startDate})
+			</if>
+			<if test="startDate != null and startDate != '' and (endDate == null or endDate == '')">
+				AND date_format(end_date, '%Y-%m-%d') <![CDATA[>]]> #{startDate}
+			</if>
+			<if test="(startDate == null or startDate == '') and endDate != null and endDate != ''">
+				AND date_format(start_date, '%Y-%m-%d') <![CDATA[< ]]> #{endDate}
+			</if>  
+			<if test="searchKeyword != nul and searchKeyword != ''">              
+				AND title LIKE concat('%', #{searchKeyword}, '%')
+			</if>
+			
+			<choose>
+				<when test='@com.jaha.evote.common.util.StringUtils@equals(popupOrderBy, "Y")'>
+					ORDER BY reg_date DESC
+				</when>
+				<otherwise>
+					ORDER BY end_date DESC
+				</otherwise>
+			</choose>
+			LIMIT #{startNum}, #{endNum} 
+	</select>
+	
+	<select id="selectPssrpListCount" parameterType="map" resultType="int">
+		/* selectPssrpListCount */
+		SELECT count(*)
+		FROM pssrp a
+		WHERE site_cd = #{siteCd}
+			AND del_yn != 'Y'
+		<if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+			AND (date_format(start_date, '%Y-%m-%d') <![CDATA[ < ]]> #{endDate}
+			AND date_format(end_date, '%Y-%m-%d') <![CDATA[>]]> #{startDate})
+		</if>
+		<if test="startDate != null and startDate != '' and (endDate == null or endDate == '')">
+			AND date_format(end_date, '%Y-%m-%d') <![CDATA[>]]> #{startDate}
+		</if>
+		<if test="(startDate == null or startDate == '') and endDate != null and endDate != ''">
+			AND date_format(start_date, '%Y-%m-%d') <![CDATA[< ]]> #{endDate}
+		</if>  
+		<if test="ckStartDate != null and ckStartDate != '' and ckEndDate != null and ckEndDate != ''">			
+			AND date_format(start_date, '%Y-%m-%d%H') <![CDATA[ < ]]> #{ckEndDate}
+ 			AND date_format(end_date, '%Y-%m-%d%H') <![CDATA[>]]> #{ckStartDate}
+	 		<if test="psSeq != null and psSeq != '' ">
+	 			AND ps_seq != #{psSeq}	
+	 		</if>
+		</if>	
+		<if test="searchKeyword != nul and searchKeyword != ''">              
+			AND title LIKE concat('%', #{searchKeyword}, '%')
+		</if> 
+	</select>
+	
+	<select id="getPssrp" parameterType="map" resultType="pssrp">
+		/* selectPssrpList */
+		SELECT ps_seq
+		       , site_cd
+		       , title
+		       , op_scale
+		       , gnr_scope
+		       , gnr_scale
+		       , gnr_std
+		       , trg_scope
+		       , trg_scale
+		       , trg_std
+		       , start_date
+		       , end_date
+		       , req_dest
+		       , req_realm
+		       , req_method
+		       , biz_scale
+		       , regulation
+		       , ineligible_biz
+		       , reg_date
+		       , reg_user
+		       , mod_date
+		       , mod_user
+		       , (select count(*) from proposal where a.ps_seq = ps_seq) as proposal_cnt
+		       <![CDATA[
+		       	, CASE WHEN (now() BETWEEN a.start_date AND a.end_date) THEN 'START' WHEN (a.start_date > now()) THEN 'WAIT' WHEN (a.end_date < now()) THEN 'END' END AS status 
+		       	]]>
+		        , CASE WHEN (SELECT count(fi.file_seq) FROM file_info fi WHERE fi.file_grp_seq = a.ps_seq AND fi.file_grp_type = 'PSSRP' AND fi.file_type = 'REQ_REALM' AND fi.delete_yn ='N') <![CDATA[ > ]]> 0  then 'Y' else 'N' end AS realmfile_yn
+		        , CASE WHEN (SELECT count(fi.file_seq) FROM file_info fi WHERE fi.file_grp_seq = a.ps_seq AND fi.file_grp_type = 'PSSRP' AND fi.file_type = 'REQ_METHOD' AND fi.delete_yn ='N') <![CDATA[ > ]]> 0  then 'Y' else 'N' end AS methodfile_yn
+		        , CASE WHEN (SELECT count(fi.file_seq) FROM file_info fi WHERE fi.file_grp_seq = a.ps_seq AND fi.file_grp_type = 'PSSRP' AND fi.file_type = 'IMG_PC' AND fi.delete_yn ='N') <![CDATA[ > ]]> 0  then 'Y' else 'N' end AS imgpcfile_yn
+		        , CASE WHEN (SELECT count(fi.file_seq) FROM file_info fi WHERE fi.file_grp_seq = a.ps_seq AND fi.file_grp_type = 'PSSRP' AND fi.file_type = 'IMG_MOB' AND fi.delete_yn ='N') <![CDATA[ > ]]> 0  then 'Y' else 'N' end AS imgmobfile_yn
+		FROM pssrp a
+		WHERE site_cd = #{siteCd}
+		AND del_yn != 'Y'	
+		<if test="psSeq != nul and psSeq != ''">  
+			AND ps_seq =#{psSeq}				
+		</if>
+		<if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+			AND date_format(reg_date, '%Y-%m-%d') between #{startDate} AND #{endDate}
+		</if>		
+	</select>
+	
+	
+	<insert id="insertPssrp" parameterType="Pssrp" useGeneratedKeys="true" keyColumn="ps_seq" keyProperty="psSeq" >
+		/* insertPssrp */
+		INSERT INTO pssrp(site_cd                       
+		                        ,title
+		                        ,op_scale
+		                        ,gnr_scope
+		                        ,gnr_scale
+		                        ,gnr_std
+		                        ,trg_scope
+		                        ,trg_scale
+		                        ,trg_std
+		                        ,start_date
+		                        ,end_date
+		                        ,req_dest
+		                        ,req_realm
+		                        ,req_method
+		                        ,biz_scale
+		                        ,regulation
+		                        ,ineligible_biz
+		                        ,del_yn
+		                        ,reg_date
+		                        ,reg_user
+		                       )
+		VALUES (#{siteCd}        
+		        , #{title}
+		        , #{opScale}
+		        , #{gnrScope}
+		        , #{gnrScale}
+		        , #{gnrStd}
+		        , #{trgScope}
+		        , #{trgScale}
+		        , #{trgStd}
+		        , #{startDate}
+		        , #{endDate}
+		        , #{reqDest}
+		        , #{reqRealm}
+		        , #{reqMethod}
+		        , #{bizScale}
+		        , #{regulation}
+		        , #{ineligibleBiz}
+		        , 'N'
+		        , now()
+		        , #{regUser} )			
+	</insert>
+	
+
+	<update id="updatePssrp" parameterType="Pssrp">
+	/* updatePssrp */
+		UPDATE pssrp
+		   SET site_cd = #{siteCd}
+		       , title = #{title}
+		       , op_scale = #{opScale}
+		       , gnr_scope = #{gnrScope}
+		       , gnr_scale = #{gnrScale}
+		       , gnr_std = #{gnrStd}
+		       , trg_scope = #{trgScope}
+		       , trg_scale = #{trgScale}
+		       , trg_std = #{trgStd}
+		       , start_date = #{startDate}
+		       , end_date = #{endDate}
+		       , req_dest = #{reqDest}
+		       , req_realm = #{reqRealm}
+		       , req_method = #{reqMethod}
+		       , biz_scale = #{bizScale}
+		       , regulation = #{regulation}
+		       , ineligible_biz = #{ineligibleBiz}
+		       , mod_date = now()
+		       , mod_user = #{regUser}
+		 WHERE ps_seq = #{psSeq}
+			AND site_cd = #{siteCd}
+	</update>
+	
+	<update id="endPssrp" parameterType="map">
+	/* endPssrp */
+		UPDATE pssrp
+		   SET  mod_date = now()
+		       , mod_user = #{regUser}
+		   <if test="eventType == 'DEL' ">
+				, del_yn = 'Y'
+			</if>
+			<if test="eventType == 'END' ">
+				, start_date = DATE_SUB(NOW(), INTERVAL 1 DAY) 
+				, end_date = DATE_ADD(NOW(), INTERVAL -1 HOUR)
+			</if>						  
+		 WHERE ps_seq = #{psSeq}
+			AND site_cd = #{siteCd}
+	</update>
+	
+	<select id="selectUserCommentCount" parameterType="Map" resultType="int">
+		SELECT count(*)
+		  FROM prop_comment cmt
+		 WHERE reg_user = #{userSeq}
+	</select>
+	
+	<select id="selectUserCommentList" parameterType="Map" resultType="Map">
+		SELECT t.cmt_seq,
+		       t.prop_seq,
+		       t.cont,
+		       t.hide_yn,
+		       date_format(t.reg_date, '%Y-%m-%d %H:%i') AS reg_date,
+		       t.reg_user,
+		       t.report_cnt,
+		       ifnull(date_format(t.report_date, '%Y-%m-%d %H:%i'), '-') AS report_date
+		  FROM (SELECT cmt_seq,
+		               prop_seq,
+		               cont,
+		               hide_yn,
+		               reg_date,
+		               reg_user,
+		               (SELECT count(*)
+		                  FROM prop_cmt_report rpt
+		                 WHERE rpt.cmt_seq = cmt.cmt_seq) AS report_cnt,
+		               (SELECT max(reg_date)
+		                  FROM prop_cmt_report rpt
+		                 WHERE rpt.cmt_seq = cmt.cmt_seq) AS report_date
+		          FROM prop_comment cmt
+		         WHERE reg_user = #{userSeq}
+		        ORDER BY cmt_seq DESC
+		         LIMIT #{startRow}, #{pagingRow}) t
+	</select>
+	
+</mapper>

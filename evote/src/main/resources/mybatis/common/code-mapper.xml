@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.common.CodeMapper">
+
+	<resultMap id="codeMap" type="CodeDetail">
+		<id property="cdGrpId" column="cd_grp_id" />
+		<id property="cdId" column="cd_id" />
+		<result property="cdNm" column="cd_nm" />
+		<result property="cdDesc" column="cd_desc" />
+		<result property="sortOrder" column="sort_order" />
+		<result property="depth" column="depth" />
+		<result property="useYn" column="use_yn" />
+		<result property="data1" column="data_1" />
+		<result property="data2" column="data_2" />
+		<result property="data3" column="data_3" />
+		<result property="data4" column="data_4" />
+		<result property="data5" column="data_5" />
+		<result property="emaulYn" column="emaul_yn" />
+		<result property="advertYn" column="advert_yn" />
+		<result property="evoteYn" column="evote_yn" />
+		<result property="regId" column="reg_id" />
+		<result property="regDate" column="reg_date" />
+		<result property="modId" column="mod_id" />
+		<result property="modDate" column="mod_date" />
+	</resultMap>
+
+	<resultMap id="codeGroupMap" type="CodeGroup">
+		<id property="cdGrpId" column="cd_grp_id" />
+		<result property="cdGrpNm" column="cd_grp_nm" />
+		<result property="cdGrpDesc" column="cd_grp_desc" />
+		<result property="sortOrder" column="sort_order" />
+		<result property="useYn" column="use_yn" />
+		<result property="emaulYn" column="emaul_yn" />
+		<result property="advertYn" column="advert_yn" />
+		<result property="evoteYn" column="evote_yn" />
+		<result property="regId" column="reg_id" />
+		<result property="regDate" column="reg_date" />
+		<result property="modId" column="mod_id" />
+		<result property="modDate" column="mod_date" />
+	</resultMap>
+
+	<select id="selectCodeList" parameterType="Map" resultMap="codeMap">
+		/* selectCodeList */
+		SELECT cd_grp_id,
+		       cd_id,
+		       cd_nm,
+		       cd_desc,
+		       sort_order,
+		       depth,
+		       use_yn,
+		       data_1,
+		       data_2,
+		       data_3,
+		       data_4,
+		       data_5,
+		       emaul_yn,
+		       advert_yn,
+		       evote_yn,
+		       reg_id,
+		       reg_date,
+		       mod_id,
+		       mod_date
+		  FROM comm_cd
+		 WHERE cd_grp_id = #{cdGrpId}
+		 ORDER BY sort_order
+	</select>
+
+	<select id="selectCodeListMap" parameterType="HashMap" resultMap="codeMap">
+		/* selectCodeListMap */
+		SELECT cd_grp_id,
+		       cd_id,
+		       cd_nm,
+		       cd_desc,
+		       sort_order,
+		       depth,
+		       use_yn,
+		       data_1,
+		       data_2,
+		       data_3,
+		       data_4,
+		       data_5,
+		       emaul_yn,
+		       advert_yn,
+		       evote_yn,
+		       reg_id,
+		       reg_date,
+		       mod_id,
+		       mod_date
+		  FROM comm_cd
+		 WHERE cd_grp_id = #{cdGrpId}
+				<if test="cd_id != null and cd_id != ''" >
+					AND cd_id = #{cd_id}
+				</if>
+				<if test="depth != null and depth != ''" >
+					AND depth = #{depth}
+				</if>
+				<if test="data_1 != null and data_1 != ''" >
+					 AND data_1 = #{data_1}
+				</if>
+		 ORDER BY sort_order
+	</select>
+	
+	<select id="selectCodeGroupList" parameterType="Map" resultMap="codeGroupMap">
+		/* selectCodeGroupList */
+		SELECT cd_grp_id,
+		       cd_grp_nm,
+		       cd_grp_desc,
+		       sort_order,
+		       use_yn,
+		       emaul_yn,
+		       advert_yn,
+		       evote_yn,
+		       reg_id,
+		       reg_date,
+		       mod_id,
+		       mod_date
+		  FROM comm_cd_grp
+		 ORDER BY sort_order
+	</select>
+	
+	<select id="selectCodeInfo" parameterType="Map" resultMap="codeMap">
+		/* selectCodeInfo */
+		SELECT cd_grp_id,
+		       cd_id,
+		       cd_nm,
+		       cd_desc,
+		       sort_order,
+		       depth,
+		       use_yn,
+		       data_1,
+		       data_2,
+		       data_3,
+		       data_4,
+		       data_5,
+		       emaul_yn,
+		       advert_yn,
+		       evote_yn,
+		       reg_id,
+		       reg_date,
+		       mod_id,
+		       mod_date
+		  FROM comm_cd
+		 WHERE cd_grp_id = #{cdGrpId}
+		   AND cd_id = #{cdId}
+	</select>
+	
+	<select id="selectRegionCode" resultType="String">
+		/* selectRegionCode */
+		SELECT getRegionCode(#{cdId})
+	</select>
+	
+</mapper>

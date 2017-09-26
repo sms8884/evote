@@ -1,0 +1,634 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.MemberMapper">
+
+	<resultMap id="memberMap" type="com.jaha.evote.domain.Member">
+		<id property="userSeq" column="user_seq" />
+		<result property="siteCd" column="site_cd" />
+		<result property="userType" column="user_type" />
+		<result property="subcmit1" column="subcmit1" />
+		<result property="subcmit2" column="subcmit2" />
+		<result property="subcmitNm1" column="subcmitNm1" />
+		<result property="subcmitNm2" column="subcmitNm2" />
+		<result property="userStat" column="user_stat" />
+		<result property="userNm" column="user_nm" />
+		<result property="nickname" column="nickname" />
+		<result property="birthYear" column="birth_year" />
+		<result property="birthDate" column="birth_date" />
+		<result property="gender" column="gender" />
+		<result property="email" column="email" />
+		<result property="phone" column="phone" />
+		<result property="userPw" column="user_pw" />
+		<result property="regionCd" column="region_cd" />
+		<result property="sidoNm" column="sido_nm" />
+		<result property="sggNm" column="sgg_nm" />
+		<result property="emdNm" column="emd_nm" />
+		<result property="lastLoginDate" column="last_login_date" />
+		<result property="termsAgreeYn" column="terms_agree_yn" />
+		<result property="termsAgreeDate" column="terms_agree_date" />
+		<result property="cmtYn" column="cmt_yn" />
+		<result property="cmtBanDate" column="cmt_ban_date" />
+		<result property="cmtBanUser" column="cmt_ban_user" />
+		<result property="pushYn" column="push_yn" />
+		<result property="pushKey" column="push_key" />
+		<result property="voteStat" column="vote_stat" />
+		<result property="banStartDate" column="ban_start_date" />
+		<result property="banEndDate" column="ban_end_date" />
+		<result property="cmtBanUserNm" column="cmt_ban_user_nm" />
+		<result property="reportCnt" column="report_cnt" />
+		<result property="regDate" column="reg_date" />
+		<result property="modDate" column="mod_date" />
+		<result property="modUser" column="mod_user" />
+		<collection property="roles" 
+					column="{userSeq=user_seq}"
+					javaType="java.util.ArrayList" 
+					ofType="com.jaha.evote.domain.type.RoleType" 
+					select="com.jaha.evote.mapper.MemberMapper.selectMemberRoles"/>
+	</resultMap>
+
+<!-- 
+	<sql id="SQL_SELECT_MEMBER">
+		SELECT user_seq,
+		       site_cd,
+		       user_type,
+		       user_type as account_type,
+		       subcmit1,
+		       subcmit2,
+		       getCodeName('CMIT_CTG', subcmit1) AS subcmitNm1,
+		       getCodeName('CMIT_CTG', subcmit2) AS subcmitNm2,
+		       user_stat,
+		       user_nm,
+		       nickname,
+		       birth_year,
+		       birth_date,
+		       gender,
+		       email,
+		       phone,
+		       user_pw,
+		       region_cd,
+		       sido_nm,
+		       sgg_nm,
+		       emd_nm,
+		       last_login_date,
+		       terms_agree_yn,
+		       terms_agree_date,
+		       cmt_yn,
+		       cmt_ban_date,
+		       cmt_ban_user,
+		       push_yn,
+		       push_key,
+		       vote_stat,
+		       ban_start_date,
+		       ban_end_date,
+		       reg_date,
+		       mod_date,
+		       mod_user
+		  FROM member_mst
+	</sql>
+-->
+
+	<sql id="SQL_SELECT_MEMBER">
+		SELECT user_seq,
+		       site_cd,
+		       user_type,
+		       subcmit1,
+		       subcmit2,
+		       getCodeName('CMIT_CTG', subcmit1) AS subcmitNm1,
+		       getCodeName('CMIT_CTG', subcmit2) AS subcmitNm2,
+		       user_stat,
+		       user_nm,
+		       nickname,
+		       birth_year,
+		       birth_date,
+		       gender,
+		       email,
+		       phone,
+		       user_pw,
+		       region_cd,
+		       sido_nm,
+		       sgg_nm,
+		       emd_nm,
+		       last_login_date,
+		       terms_agree_yn,
+		       terms_agree_date,
+		       cmt_yn,
+		       cmt_ban_date,
+		       cmt_ban_user,
+		       (select mgr_nm from manager_mst mgr where mgr.mgr_seq = m.cmt_ban_user) as cmt_ban_user_nm,
+		       push_yn,
+		       push_key,
+		       vote_stat,
+		       ban_start_date,
+		       ban_end_date,
+		       reg_date,
+		       mod_date,
+		       mod_user,
+		       (select count(*) from prop_cmt_report r where r.user_seq = m.user_seq) as report_cnt
+		  FROM member_mst m
+	</sql>
+
+	<select id="selectUserInfoByEmail" parameterType="String" resultMap="memberMap">
+		/* selectUserInfoByEmail */
+		<include refid="SQL_SELECT_MEMBER" />
+		 WHERE email = #{email}
+	</select>
+
+	<select id="selectUserInfoByPhone" parameterType="String" resultMap="memberMap">
+		/* selectUserInfoByPhone */
+		<include refid="SQL_SELECT_MEMBER" />
+		 WHERE phone = #{phone}
+	</select>
+
+	<select id="getUserInfoById" parameterType="HashMap" resultMap="memberMap">
+		/* getUserInfoById */
+		<include refid="SQL_SELECT_MEMBER" />
+		 WHERE user_seq = #{user_seq}
+	</select>
+	
+	<select id="selectUserPhoneCount" parameterType="String" resultType="int">
+		/* selectUserPhoneCount */
+		SELECT count(*)
+		  FROM member_mst
+		 WHERE phone = #{phone}
+	</select>
+
+	<select id="selectUserNicknameCount" parameterType="HashMap" resultType="int">
+		/* selectUserNicknameCount */
+		SELECT count(*)
+		  FROM member_mst
+		 WHERE nickname = #{nickname}
+		   AND site_cd = #{siteCd}
+	</select>
+	
+	<update id="updateLastLoginDate" parameterType="HashMap">
+		/* updateLastLoginDate */
+		update member_mst
+		   set last_login_date = now()
+		   <if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(pushKey)">
+		   , push_key = #{pushKey}
+		   </if>
+		   <if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(loginIp)">
+		   , login_ip = #{loginIp}
+		   </if>
+		   <if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(accessToken)">
+		   , access_token = #{accessToken}
+		   , expire_time = DATE_ADD(now(),INTERVAL 30 DAY)
+		   </if>
+		 where user_seq = #{userSeq}
+	</update>
+
+	<insert id="insertMember" parameterType="member" useGeneratedKeys="true" keyColumn="user_seq" keyProperty="userSeq">
+		/* insertMember */
+		INSERT INTO member_mst
+		(
+			user_type,
+			site_cd,
+			user_stat,
+			user_nm,
+			nickname,
+			birth_year,
+			birth_date,
+			gender,
+			email,
+			phone,
+			user_pw,
+			region_cd,
+			sido_nm,
+			sgg_nm,
+			emd_nm,
+			terms_agree_yn,
+			terms_agree_date,
+			cmt_yn,
+			vote_stat,
+			reg_date
+		)
+		VALUES 
+		(
+			#{userType},
+			#{siteCd},
+			#{userStat},
+			#{userNm},
+			#{nickname},
+			#{birthYear},
+			#{birthDate},
+			#{gender},
+			#{email},
+			#{phone},
+			#{userPw},
+			#{regionCd},
+			#{sidoNm},
+			#{sggNm},
+			#{emdNm},
+			#{termsAgreeYn},
+			now(),
+			'Y',
+			'Y',
+			now()
+		)
+	</insert>
+
+	<insert id="insertMemberRole">
+		<bind name="_ROLE_TYPE_USER" value="@com.jaha.evote.domain.type.RoleType@USER" />
+		/* insertMemberRole */
+		INSERT INTO member_roles
+		(
+			user_seq,
+			role,
+			reg_user,
+			reg_date
+		)
+		VALUES 
+		(
+			#{userSeq},
+			#{_ROLE_TYPE_USER},
+			#{userSeq},
+			now()
+		)
+	</insert>
+
+<!--
+	<insert id="insertMemberMerge" parameterType="member" useGeneratedKeys="true" keyColumn="user_seq" keyProperty="userSeq">
+		INSERT INTO member_mst
+		(
+			user_type,
+			site_cd,
+			user_stat,
+			user_nm,
+			nickname,
+			birth_year,
+			birth_date,
+			gender,
+			email,
+			phone,
+			user_pw,
+			region_cd,
+			sido_nm,
+			sgg_nm,
+			emd_nm,
+			terms_agree_yn,
+			terms_agree_date,
+			reg_date
+		)
+		VALUES 
+		(
+			#{userType},
+			#{siteCd},
+			#{userStat},
+			#{userNm},
+			#{nickname},
+			#{birthYear},
+			#{birthDate},
+			#{gender},
+			#{email},
+			#{phone},
+			#{userPw},
+			#{regionCd},
+			#{sidoNm},
+			#{sggNm},
+			#{emdNm},
+			#{termsAgreeYn},
+			now(),
+			now()
+		)
+		ON DUPLICATE KEY UPDATE
+			user_type = #{userType},
+			site_cd = #{siteCd},
+			user_stat = #{userStat},
+			user_nm = #{userNm},
+			nickname = #{nickname},
+			birth_year = #{birthYear},
+			birth_date = #{birthDate},
+			gender = #{gender},
+			email = #{email},
+			phone = #{phone},
+			user_pw = #{userPw},
+			region_cd = #{regionCd},
+			sido_nm = #{sidoNm},
+			sgg_nm = #{sggNm},
+			emd_nm = #{emdNm},
+			last_login_date = now(),
+			terms_agree_yn = #{termsAgreeYn},
+			terms_agree_date = now(),
+			mod_date = now(),
+			mod_user = mod_user
+	</insert>
+-->
+	
+	<insert id="insertMemberHist" useGeneratedKeys="true">
+		/* insertMemberHist */
+		INSERT INTO member_hist
+		(
+			user_seq,
+			site_cd,
+			user_type,
+			user_stat,
+			user_nm,
+			nickname,
+			birth_year,
+			birth_date,
+			gender,
+			email,
+			phone,
+			user_pw,
+			region_cd,
+			sido_nm,
+			sgg_nm,
+			emd_nm,
+			last_login_date,
+			terms_agree_yn,
+			terms_agree_date,
+			cmt_yn,
+			push_yn,
+			push_key,
+			vote_stat,
+			ban_start_date,
+			ban_end_date,
+			reg_date,
+			mod_date,
+			mod_user
+		)
+		   SELECT user_seq,
+		          site_cd,
+		          user_type,
+		          user_stat,
+		          user_nm,
+		          nickname,
+		          birth_year,
+		          birth_date,
+		          gender,
+		          email,
+		          phone,
+		          user_pw,
+		          region_cd,
+		          sido_nm,
+		          sgg_nm,
+		          emd_nm,
+		          last_login_date,
+		          terms_agree_yn,
+		          terms_agree_date,
+		          cmt_yn,
+		          push_yn,
+		          push_key,
+		          vote_stat,
+		          ban_start_date,
+		          ban_end_date,
+		          reg_date,
+		          mod_date,
+		          mod_user
+		     FROM member_mst
+		    WHERE user_seq = #{userSeq}
+	</insert>
+	
+	<update id="updateCommentAuth" parameterType="map">
+		/* updateCommentAuth */
+        UPDATE member_mst
+        SET cmt_yn = #{cmtYn},
+        	<if test='@com.jaha.evote.common.util.StringUtils@equals(cmtYn, "Y")'>
+		    cmt_ban_user = NULL,
+            cmt_ban_date = NULL,
+        	</if>
+        	<if test='@com.jaha.evote.common.util.StringUtils@equals(cmtYn, "N")'>
+		    cmt_ban_user = #{mgrSeq},
+            cmt_ban_date = now(),
+        	</if>
+        	mod_user = #{mgrSeq},
+        	mod_date = now()
+        WHERE user_seq = #{userSeq}
+    </update>
+	
+	<update id="updateMemberType" parameterType="member">
+		/* updateMemberType */
+		UPDATE member_mst
+		   SET user_type = #{userType},
+		       user_nm = #{userNm},
+		       nickname = #{nickname},
+		       email = #{email},
+		       user_pw = #{userPw},
+		       cmt_yn = 'Y',
+		       mod_date = now(),
+		       mod_user = #{userSeq}
+	     WHERE user_seq = #{userSeq}
+	</update>
+	
+	<update id="updateTerms" parameterType="map">
+		/* updateTerms */
+		UPDATE member_mst
+		   SET terms_agree_yn = #{termsAgreeYn},
+		       terms_agree_date = now(),
+		       mod_date = now(),
+		       mod_user = #{userSeq}
+	     WHERE user_seq = #{userSeq}
+	</update>
+	
+	<select id="selectInquiryUser" parameterType="HashMap" resultMap="memberMap">
+		/* selectInquiryUser */
+		<include refid="SQL_SELECT_MEMBER" />
+		 WHERE site_cd = #{siteCd}
+		   <!-- AND user_type = #{userType} -->
+		   AND user_stat = #{userStat}
+		   AND phone = #{phone}
+		   <if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(userNm)">
+		   AND user_nm = #{userNm}
+		   </if>
+		   <if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(email)">
+		   AND email = #{email}
+		   </if>
+	</select>
+	
+	<update id="resetUserpw">
+		/* resetUserpw */
+		UPDATE member_mst
+		   SET user_pw = #{userPw},
+		       mod_date = now()
+	     WHERE phone = #{phone}
+	       AND email = #{email}
+	</update>
+	
+	<update id="updateMember" parameterType="member">
+		/* updateMember */
+		UPDATE member_mst
+		   SET 
+			   <if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(phone.value)">
+		       phone = #{phone},
+			   </if>
+		       region_cd = #{regionCd},
+		       sido_nm = #{sidoNm},
+		       sgg_nm = #{sggNm},
+		       emd_nm = #{emdNm},
+		       mod_date = now(),
+		       mod_user = #{modUser}
+		 WHERE user_seq = #{userSeq}
+	</update>
+
+	<update id="updateMemberPassword" parameterType="map">
+		/* updateMemberPassword */
+		UPDATE member_mst
+		   SET user_pw = #{userPw},
+		       mod_date = now(),
+		       mod_user = #{userSeq}
+		 WHERE user_seq = #{userSeq}	
+	</update>
+	
+	<update id="updateMemberWithdrawal" parameterType="map">
+		/* updateMemberWithdrawal */
+		UPDATE member_mst
+		   SET user_stat = #{userStat},
+		       user_pw = NULL,
+		       last_login_date = NULL,
+		       terms_agree_yn = NULL,
+		       terms_agree_date = NULL,
+		       cmt_yn = NULL,
+		       cmt_ban_date = NULL,
+		       cmt_ban_user = NULL,
+		       push_yn = NULL,
+		       push_key = NULL,
+		       vote_stat = NULL,
+		       ban_start_date = NULL,
+		       ban_end_date = NULL,
+		       mod_date = now(),
+		       mod_user = #{userSeq}
+		 WHERE user_seq = #{userSeq}
+	</update>
+	
+	<!--====================================================================-->
+	<!-- ADMIN -->
+	<!--====================================================================-->
+
+	<sql id="SQL_SEARCH_MEMBER_LIST">
+
+		<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(searchStartDate) and @com.jaha.evote.common.util.StringUtils@isNotEmpty(searchEndDate)">
+		<![CDATA[
+		  AND reg_date BETWEEN STR_TO_DATE(#{searchStartDate}, '%Y-%m-%d') AND DATE_ADD(STR_TO_DATE(#{searchEndDate}, '%Y-%m-%d'), INTERVAL 1 DAY)
+		]]>
+		</if>
+
+		<if test='@com.jaha.evote.common.util.StringUtils@isNotEmpty(searchType)'>
+		  AND user_type = #{searchType}
+		</if>
+
+		<if test='@com.jaha.evote.common.util.StringUtils@isNotEmpty(searchComment)'>
+		  AND cmt_yn = #{searchComment}
+		</if>
+
+		<if test='@com.jaha.evote.common.util.StringUtils@isNotEmpty(searchStatus)'>
+		  AND user_stat = #{searchStatus}
+		</if>
+
+		<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(searchTarget) and @com.jaha.evote.common.util.StringUtils@isNotEmpty(searchText)">
+			<if test="@com.jaha.evote.common.util.StringUtils@equals(searchTarget, 'EMAIL')">
+			  AND email = #{encSearchText}
+			</if>
+			<if test="@com.jaha.evote.common.util.StringUtils@equals(searchTarget, 'PHONE')">
+			  AND phone = #{encSearchText}
+			</if>
+			<if test="@com.jaha.evote.common.util.StringUtils@equals(searchTarget, 'NAME')">
+			  AND user_nm = #{encSearchText}
+			</if>
+			<if test="@com.jaha.evote.common.util.StringUtils@equals(searchTarget, 'NICKNAME')">
+			  AND nickname LIKE CONCAT('%',#{searchText},'%')
+			</if>
+		</if>
+				
+	</sql>
+	
+	<select id="selectMemberAgreeListCount" parameterType="String" resultType="int">
+		<bind name="_USER_TYPE_EMAIL" value="@com.jaha.evote.domain.type.UserType@EMAIL" />
+		<bind name="_USER_TYPE_CMIT" value="@com.jaha.evote.domain.type.UserType@CMIT" />
+		<bind name="_USER_STATUS_AVAILABLE" value="@com.jaha.evote.domain.type.UserStatus@AVAILABLE" />
+		/* selectMemberAgreeListCount */
+		SELECT COUNT(*)
+		  FROM member_mst
+		 WHERE site_cd = #{siteCd}
+		   AND user_type IN (#{_USER_TYPE_EMAIL}, #{_USER_TYPE_CMIT})
+		   AND user_stat = #{_USER_STATUS_AVAILABLE}
+		   AND terms_agree_yn = 'Y'
+	</select>
+
+	<select id="selectMemberAgreeList" parameterType="String" resultMap="memberMap">
+		<bind name="_USER_TYPE_EMAIL" value="@com.jaha.evote.domain.type.UserType@EMAIL" />
+		<bind name="_USER_TYPE_CMIT" value="@com.jaha.evote.domain.type.UserType@CMIT" />
+		<bind name="_USER_STATUS_AVAILABLE" value="@com.jaha.evote.domain.type.UserStatus@AVAILABLE" />
+		/* selectMemberAgreeList */
+		<include refid="SQL_SELECT_MEMBER" />
+		 WHERE site_cd = #{siteCd}
+		   AND user_type IN (#{_USER_TYPE_EMAIL}, #{_USER_TYPE_CMIT})
+		   AND user_stat = #{_USER_STATUS_AVAILABLE}
+		   AND terms_agree_yn = 'Y'
+	</select>
+
+	<select id="selectMemberListCount" parameterType="Map" resultType="int">
+		/* selectMemberListCount */
+		SELECT COUNT(*)
+		  FROM member_mst
+		 WHERE site_cd = #{siteCd}
+		 <include refid="SQL_SEARCH_MEMBER_LIST" />
+	</select>
+	
+	<select id="selectMemberList" parameterType="Map" resultMap="memberMap">
+		/* selectMemberList */
+		<include refid="SQL_SELECT_MEMBER" />
+		 WHERE site_cd = #{siteCd}
+		 <include refid="SQL_SEARCH_MEMBER_LIST" />
+		 LIMIT #{startRow}, #{pagingRow}
+	</select>
+	
+	<select id="selectMemberListExcel" parameterType="String" resultMap="memberMap">
+		/* selectMemberListExcel */
+		<include refid="SQL_SELECT_MEMBER" />
+		 WHERE site_cd = #{siteCd}
+	</select>
+
+	<update id="updateVoteStat">
+		/* updateVoteStat */
+		update member_mst
+		   SET vote_stat = #{voteStat},
+		   <if test='@com.jaha.evote.common.util.StringUtils@equals(voteStat, "Y") or @com.jaha.evote.common.util.StringUtils@equals(voteStat, "N")'>
+		       ban_start_date = NULL,
+		       ban_end_date = NULL,
+		   </if>
+		   <if test='@com.jaha.evote.common.util.StringUtils@equals(voteStat, "P")'>
+		       ban_start_date = STR_TO_DATE(#{banStartDate}, '%Y-%m-%d'),
+		       ban_end_date = STR_TO_DATE(concat(#{banEndDate}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s'),
+		   </if>
+		       mod_user = #{modUser},
+		       mod_date = now()
+		 WHERE user_seq = #{userSeq}
+	</update>
+
+	<update id="updateGrantSubcmit">
+		<bind name="_USER_TYPE_CMIT" value="@com.jaha.evote.domain.type.UserType@CMIT" />
+		/* updateGrantSubcmit */
+		update member_mst
+		   SET user_type = #{_USER_TYPE_CMIT},
+		       subcmit1 = #{subcmit1},
+		       <if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(subcmit2)">
+		       subcmit2 = #{subcmit2},
+		       </if>
+		       mod_user = #{modUser},
+		       mod_date = now()
+		 WHERE site_cd = #{siteCd}
+		   AND user_seq = #{userSeq}
+	</update>
+
+	<update id="updateRevokeSubcmit">
+		<bind name="_USER_TYPE_EMAIL" value="@com.jaha.evote.domain.type.UserType@EMAIL" />
+		/* updateRevokeSubcmit */
+		update member_mst
+		   SET user_type = #{_USER_TYPE_EMAIL},
+		       subcmit1 = NULL,
+		       subcmit2 = NULL,
+		       mod_user = #{modUser},
+		       mod_date = now()
+		 WHERE site_cd = #{siteCd}
+		   AND user_seq = #{userSeq}
+	</update>
+
+	<select id="selectMemberRoles" resultType="com.jaha.evote.domain.type.RoleType">
+		/* selectMemberRoles */
+		SELECT role
+		  FROM member_roles
+		 WHERE user_seq = #{userSeq}
+	</select>
+
+</mapper>

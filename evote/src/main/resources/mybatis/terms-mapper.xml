@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.TermsMapper">
+
+	<select id="selectTermsList" resultType="terms">
+		/* selectTermsList */
+		SELECT terms_seq,
+		       terms_type,
+		       terms_title,
+		       terms_cont,
+		       use_yn
+		  FROM terms
+		 WHERE USE_YN = 'Y'
+	</select>
+	
+	<select id="selectTerms" parameterType="Map" resultType="terms">
+		/* selectTerms */
+		SELECT terms_seq,
+		       terms_type,
+		       terms_title,
+		       terms_cont,
+		       use_yn
+		  FROM terms
+		 WHERE USE_YN = 'Y'
+		   AND terms_type = #{termsType}
+	</select>
+	
+</mapper>

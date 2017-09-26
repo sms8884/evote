@@ -1,0 +1,377 @@
+@charset "utf-8";
+@import url('../../css/base.css');
+@import url('layout.css');
+
+
+ul.loginTab					{ height:81px; width:100%; display:inline-block; }
+ul.loginTab li					{ width:50%; float:left; height:81px; }
+ul.loginTab li a				{ display:block; height:80px; border-bottom:1px solid #e6e6e6; font-size:22px; color:#8f8f8f; text-align:center; line-height:80px; text-decoration:none; background:#f0f0f0; }
+ul.loginTab li a.on			{ background:#fff; border-bottom:1px solid #fff; color:#343434; border-left:1px solid #e6e6e6; border-right:0; }
+ul.loginTab li:first-child a.on			{ background:#fff; border-bottom:1px solid #fff; color:#343434; border-right:1px solid #e6e6e6; border-left:0; }
+
+div.memberlogin							{ padding:80px 0 0; border-bottom:1px solid #dbdbdb; margin:0 164px; }
+div.memberlogin p						{ border:1px solid #d4d4d4; margin:0 0 10px; }
+div.memberlogin input					{ width:100%; height:51px; line-height:51px; border:0; font-size:18px;/* color:#dbdbdb; */text-indent:20px; }
+div.memberlogin input.it.id			{ background:url(../img/etc/loginId.png) 94% 50% no-repeat; }
+div.memberlogin input.it.pw			{ background:url(../img/etc/loginPw.png) 93.5% 50% no-repeat; }
+div.memberlogin a.loginBt			{ width:100%; height:60px; text-align:center; color:#fff; line-height:60px; background:#1278e1; display:inline-block; margin:30px 0 40px; font-size:18px; font-weight:bold; }
+div.memberlogin a.loginBt:hover			{ background:#393d4c; text-decoration:none; }
+
+div.memberlogin2							{ padding:80px 0 0; border-bottom:1px solid #dbdbdb; margin:0 164px; }
+div.memberlogin2 p						{ margin:0 0 10px; display:inline-block; width:100%; }
+div.memberlogin2 p span				{ width:293px; float:left; border:1px solid #d4d4d4; }
+div.memberlogin2 p a.pn				{ color:#393d4c; font-size:15px; text-align:center; height:48px; line-height:48px; width:132px; border:1px solid #393d4c; float:right; }
+div.memberlogin2 p a.pn:hover	{ background:#f5f5f5; text-decoration:none; }
+div.memberlogin2 p a.an				{ color:#fff; font-size:15px; text-align:center; height:50px; line-height:50px; width:134px;  float:right; background:#1278e1; }
+div.memberlogin2 p a.an:hover	{ background:#393d4c; text-decoration:none; }
+div.memberlogin2 input				{ width:100%; height:48px; line-height:48px; border:0; font-size:18px; /*color:#dbdbdb; */text-indent:20px; }
+div.memberlogin2 input.it.id			{ background:url(../img/etc/loginId.png) 94% 50% no-repeat; }
+div.memberlogin2 input.it.pw		{ background:url(../img/etc/loginPw.png) 93.5% 50% no-repeat; }
+div.memberlogin2 span.time		{ display:inline-block; padding:10px 0 0 0; color:#ec4949; font-size:15px; font-weight:bold; }
+div.memberlogin2 a.loginBt			{ width:100%; height:60px; text-align:center; color:#fff; line-height:60px; background:#1278e1; display:inline-block; margin:30px 0 40px; font-size:18px; font-weight:bold; }
+div.memberlogin2 a.loginBt:hover			{ background:#393d4c; text-decoration:none; }
+
+p.loginMbt									{ text-align:center; padding:40px 20px 98px 0; }
+p.loginMbt a									{ padding:60px 0 0 0; height:22px; font-size:15px; color:#8f8f8f; line-height:22px; display:inline-block; margin:0 32px; }
+p.loginMbt a.loginMbt1					{ background:url(../img/etc/loginMbt1.png) 50% 0 no-repeat; }
+p.loginMbt a.loginMbt2					{ background:url(../img/etc/loginMbt2.png) 50% 0 no-repeat; }
+p.loginMbt a.loginMbt3					{ background:url(../img/etc/loginMbt3.png) 50% 0 no-repeat; color:#1278e1; }
+
+
+/*이용약관 전체보기 팝업*/
+div.loginMbtLayer							{ padding:0 17px 16px; border:2px solid #000; }
+div.loginMbtLayer p.tit					{ height:81px; line-height:81px; border-bottom:1px solid #e7e7e7; font-size:25px; font-weight:bold; text-align:center; }
+div.loginMbtLayer1							{ padding:0 17px 16px; border:2px solid #000; }
+div.loginMbtLayer1 p.tit					{ height:81px; line-height:81px; border-bottom:1px solid #e7e7e7; font-size:25px; font-weight:bold; text-align:center; }
+div.loginMbtLayerCon					{ padding:40px 0 0; position:relative; }
+div.loginMbtLayerCon p.txt1		{ text-align:center; font-size:18px; font-weight:bold; }
+div.loginMbtLayerCon p.txt2		{ text-align:center; font-size:24px; color:#1278e1; padding:15px 0 30px; font-weight:bold; }
+div.loginMbtLayerCon p.txt3		{ text-align:center; font-size:18px; padding:15px 0 30px; font-weight:bold; }
+div.loginMbtLayerCon p.inptxt		{ width:100%; height:60px; font-size:18px; padding:15px 0 30px;}
+div.loginMbtLayerCon .widinputxt	{ width:99%; height:60px; font-size:18px; }
+div.loginMbtLayerCon a.bt			{ width:100%; height:60px; display:block; background:#1278e1; text-align:center; }
+div.loginMbtLayerCon a.bt:hover			{ background:#393d4c; }
+div.loginMbtLayerCon a.bt span			{ display:inline-block; height:60px; line-height:60px; color:#fff; font-size:18px; padding:0 0 0 25px; background:url(../img/vote/btn_sel.png) 0 46% no-repeat; }
+div.loginMbtLayerCon a.btW1			{ width:49%; height:56px; display:inline-block; background:#fff; text-align:center; border:2px solid #343434 }
+div.loginMbtLayerCon a.btW1:hover			{ background:#f5f5f5; }
+div.loginMbtLayerCon a.btW1 span			{ display:inline-block; height:60px; line-height:60px; font-size:18px;  }
+div.loginMbtLayerCon a.btC1			{ width:49%; height:60px; display:inline-block; background:#1278e1; text-align:center; }
+div.loginMbtLayerCon a.btC1:hover			{ background:#393d4c; }
+div.loginMbtLayerCon a.btC1 span			{ display:inline-block; height:60px; line-height:60px; color:#fff; font-size:18px; padding:0 0 0 25px; background:url(../img/vote/btn_sel.png) 0 46% no-repeat; }
+div.loginMbtLayerCon a.layerClose		{ position:absolute; top:-76px; right:-10px; display:inline-block; padding:10px; }
+
+/*회원탈퇴 안내 팝업*/
+div.member_leave						{ padding:0 50px 30px 50px; border-radius:10px; background: #fff; position:fixed; top:70%; left:34.5%; z-index:99999;}
+div.member_leave p.tit					{ border-bottom:1px solid #e7e7e7; font-size:25px; font-weight:bold; text-align:center;}
+div.member_leaveCon						{ position:relative;}
+div.member_leaveCon p.txt1				{ text-align:left; font-size:13.5px; padding:20px 0; font-weight:bold; line-height:150%;}
+div.member_leaveCon p.txt2				{ text-align:left; font-size:13.5px; font-weight:bold; line-height:150%;}
+div.member_leaveCon p.txt2 span			{color:#1278e1;}
+div.member_leaveCon p.txt3				{ text-align:left; font-size:13.5px; padding:20px 0; font-weight:bold; color:#1278e1;}
+div.member_leaveCon p.agree				{width:100%; height:50px; border:1px solid #e7e7e7; text-align:center; font-size:13.5px; font-weight:bold;}
+div.member_leaveCon p.agree a			{ background:url(../img/common/chkOff.png)100% 100% no-repeat;}
+div.member_leaveCon a.layerClose3 span	{display:inline-block; height:100px; line-height:60px; color:#000; font-size:18px;}
+div.member_leaveCon a.layerClose4 span	{ display:inline-block; height:60px; line-height:60px; color:#fff; font-size:18px; padding:0 0 0 25px; background:url(../img/vote/btn_sel.png) 0 46% no-repeat; }
+div.member_leaveCon a.layerClose		{ position:absolute; top:-76px; right:-10px; display:inline-block; padding:10px; }
+div.member_leaveCon a.layerClose3		{width:220px; height:60px; display:block; background:#fff; float:left; text-align:center; border:1px solid #000; margin-top:40px;}
+div.member_leaveCon a.layerClose4		{width:220px; height:60px; display:block; background:#1278e1; text-align:center; float:right; margin-top:40px;}
+div.member_leaveCon a.bt:hover				{ background:#393d4c; }
+div.member_leaveCon div.agreeChk			{width:100%; height:60px; border:1px solid #e7e7e7;}
+div.member_leaveCon div.agreeChk p			{display:inline-block; line-height:60px; margin-left:20px; font-size:14px; font-weight:bold;}
+div.member_leaveCon div.agreeChk p a.chk   {display:inline-block; height:22px; background: url(../img/common/chkOff.png)0 50% no-repeat;}
+div.member_leaveCon div.agreeChk p a.chk.on   {display:inline-block; height:22px; background: url(../img/common/chkOn.png)0 50% no-repeat;}
+
+
+
+
+p.memberTxt								{ padding:40px 0 70px; text-align:center; font-size:18px; color:#8f8f8f; line-height:150%; }
+p.memberTxt > a						{ font-size:18px; color:#1278e1; text-decoration:underline; }
+ul.memberSel								{ padding:0 74px 105px; overflow:hidden; }
+ul.memberSel li								{ float:left; width:200px; padding:39px; border:1px solid #e6e6e6; margin:0 15px; text-align:center; }
+ul.memberSel li:hover					{ background:#f3f3f3; }
+ul.memberSel li strong					{ font-size:22px; color:#343434; display:block; padding:0 0 122px; }
+ul.memberSel li strong.pb			{ background:url(../img/etc/pb.png) 50% 51px no-repeat; }
+ul.memberSel li strong.eb			{ background:url(../img/etc/eb.png) 50% 64px no-repeat; }
+ul.memberSel li a							{ display:block; width:100%; height:50px; line-height:50px; color:#fff; background:#1278e1; font-size:15px; }
+ul.memberSel li a:hover				{ background:#393d4c; text-decoration:none; }
+
+
+a.next								{ display:block; width:296px; height:56px; line-height:56px; text-align:center; border:2px solid #343434; font-size:18px; margin:0 auto 50px; font-weight:bold; }
+a.next:hover					{ background:#f3f3f3; text-decoration:none; color:#343434; }
+
+a.memberEnd					{ width:300px; height:60px; text-align:center; color:#fff; line-height:60px; background:#1278e1; display:block; margin:30px auto 40px; font-size:18px; font-weight:bold; }
+a.memberEnd:hover		{ background:#393d4c; text-decoration:none; }
+
+div.step1									{  }
+div.step1 p.tit								{ padding:48px 0; text-align:center; font-size:24px; }
+div.step2 p.tit								{ padding:48px 0; text-align:center; font-size:24px; }
+div.step3 p.tit								{ padding:48px 0; text-align:center; font-size:24px; }
+div.step3 p.tit span						{ display:block; padding:8px 0 0; font-size:16px; color:#8f8f8f; line-height:140%; }
+div.step3 p.tit span strong			{ color:#1278e1; font-size:16px; text-decoration:underline; }
+
+a.chk											{ padding:0 0 0 35px; background:url(../img/common/chkOff.png) 0 20% no-repeat; }
+a.chk.on										{ background:url(../img/common/chkOn.png) 0 50% no-repeat; }
+a.chk:hover									{ color:#343434; text-decoration:none; }
+
+p.allChk										{ padding:0 88px; }
+p.allChk a										{ display:block; height:22px; line-height:22px; font-size:18px; font-weight:bold; }
+p.allChk span								{ font-size:15px; color:#8f8f8f; padding:10px 0 0 35px; display:inline-block; }
+
+div.step1 ul									{ width:648px; height:151px; border:1px solid #e6e6e6; margin:30px auto 30px; padding:30px 0 0; }
+div.step1 ul li								{ padding:0 28px 30px; height:22px; position:relative; }
+div.step1 ul li a.chk						{ display:block; height:22px; line-height:22px; font-size:16px; font-weight:bold; }
+div.step1 ul li a.chk span				{ font-size:16px; color:#999; }
+div.step1 ul li a.more					{ position:absolute; top:0; right:30px; padding:0 15px 0 0; background:url(../img/etc/stepMoreArr.png) 100% 35% no-repeat; font-size:15px; color:#2a2a2a; font-weight:bold; }
+
+
+div.step2 p.birth							{ padding:0 159px 20px; }
+div.step2 p.birth>strong				{ font-size:18px; color:#2a2a2a; display:block; padding:0 0 15px; }
+div.step2 p.birth select				{ height:48px; line-height:48px; padding:10px 0; border:1px solid #e6e6e6; margin:0 0 0 10px; font-size:18px; color:#8f8f8f; }
+div.step2 p.birth>span					{ display:block; padding:14px 0 10px; color:#ec4949; font-size:15px; font-weight:bold; }
+
+div.certi							{ padding:0 159px 50px; }
+div.certi>strong				{ font-size:18px; color:#2a2a2a; display:inline-block; padding:0 0 15px; }
+div.certi p							{ margin:0 0 10px; display:inline-block; width:100%; }
+div.certi p span				{ width:293px; float:left; border:1px solid #d4d4d4; }
+div.certi p a.pn					{ color:#393d4c; font-size:15px; text-align:center; height:48px; line-height:48px; width:132px; border:1px solid #393d4c; float:right; }
+div.certi p a.pn:hover		{ background:#f5f5f5; text-decoration:none; }
+div.certi p a.an					{ color:#fff; font-size:15px; text-align:center; height:50px; line-height:50px; width:134px;  float:right; background:#1278e1; }
+div.certi p a.an:hover		{ background:#2a4f74; text-decoration:none; }
+div.certi input					{ width:100%; height:48px; line-height:48px; border:0; font-size:18px; /*color:#dbdbdb; */text-indent:20px; }
+div.certi input.it.id			{ background:url(../img/etc/loginId.png) 94% 50% no-repeat; }
+div.certi input.it.pw			{ background:url(../img/etc/loginPw.png) 93.5% 50% no-repeat; }
+div.certi span.time			{ display:inline-block; padding:10px 0 0 0; color:#ec4949; font-size:15px; font-weight:bold; }
+
+div.mail								{ padding:0 159px 20px; }
+div.mail>strong				{ font-size:18px; color:#2a2a2a; display:inline-block; padding:0 0 15px; }
+div.mail p							{ margin:0 0 10px; display:inline-block; width:100%; }
+div.mail p span					{ width:303px; float:left; border:1px solid #d4d4d4; }
+div.mail p a.an					{ color:#fff; font-size:15px; text-align:center; height:50px; line-height:50px; width:134px;  float:right; background:#1278e1; }
+div.mail p a.an:hover		{ background:#2a4f74; text-decoration:none; }
+div.mail input					{ width:100%; height:48px;  line-height:48px;border:0; font-size:18px;/* color:#dbdbdb; */text-indent:20px; }
+
+div.password					{ padding:0 159px 50px; }
+div.password>strong		{ font-size:18px; color:#2a2a2a; display:inline-block; padding:0 0 16px; }
+div.password p				{ margin:-1px 0 0; display:block; border:1px solid #d4d4d4; }
+div.password input			{ width:100%; height:48px; line-height:48px; border:0; font-size:18px; /*color:#dbdbdb; */text-indent:20px; }
+
+div.name							{ padding:0 159px 20px; }
+div.name>strong				{ font-size:18px; color:#2a2a2a; display:inline-block; padding:0 0 15px; }
+div.name p						{ margin:-1px 0 0; display:block; border:1px solid #d4d4d4; }
+div.name input					{ width:100%; height:48px; line-height:48px; border:0; font-size:18px;/* color:#dbdbdb; */text-indent:20px; }
+
+div.nick								{ padding:0 159px 20px; }
+div.nick>strong				{ font-size:18px; color:#2a2a2a; display:inline-block; padding:0 0 15px; }
+div.nick p							{ margin:0 0 10px; display:inline-block; width:100%; }
+div.nick p span					{ width:303px; float:left; border:1px solid #d4d4d4; }
+div.nick p a.an					{ color:#fff; font-size:15px; text-align:center; height:50px; line-height:50px; width:134px;  float:right; background:#1278e1; }
+div.nick p a.an:hover		{ background:#2a4f74; text-decoration:none; }
+div.nick input					{ width:100%; height:48px; line-height:48px; border:0; font-size:18px;/* color:#dbdbdb; */text-indent:20px; }
+
+div.area							{ padding:0 159px 20px; }
+div.area>strong				{ font-size:18px; color:#2a2a2a; display:inline-block; padding:0 0 15px; }
+div.area p							{ margin:0 0 10px; display:inline-block; width:100%; }
+div.area p span				{ float:left; width:168px; height:48px; line-height:48px; text-indent:20px; background:#f0f0f0; font-size:18px; color:#8f8f8f; border:1px solid #d4d4d4; border-right:0; }
+div.area p select				{ width:279px; height:50px; padding:10px 0; border:1px solid #d4d4d4; font-size:18px; /*color:#dbdbdb;*/ }
+
+
+div.gender						{ padding:0 159px 20px; }
+div.gender>strong			{ font-size:18px; color:#2a2a2a; display:inline-block; padding:0 0 15px; }
+div.gender ul					{ display:inline-block; width:100%; }
+div.gender ul li					{ width:50%; float:left; }
+div.gender ul li a				{ display:block; height:48px; line-height:48px; text-align:center; border:1px solid #d4d4d4; font-size:18px; color:#8f8f8f; text-decoration:none; }
+div.gender ul li a.on			{ border:1px solid #8f8f8f; color:#fff; background:#8f8f8f; }
+
+
+div.memberInfo				{ width:408px; margin:40px auto 0;}
+div.memberInfo p.tit			{ padding:50px 0 10px; font-size:18px; color:#8f8f8f; font-weight:bold; }
+div.memberInfo table		{ width:100%; text-align:left; }
+div.memberInfo table th	{ width:170px; border-bottom:1px solid #e6e6e6; height:58px; font-size:18px; color:#2a2a2a; }
+div.memberInfo table td	{ width:238px; border-bottom:1px solid #e6e6e6; font-size:18px; color:#343434; }
+
+p.memberInfoBt				{ padding:30px 0 50px; text-align:center; }
+p.memberInfoBt a			{ width:300px; height:60px; text-align:center; line-height:60px; display:inline-block; font-size:18px; color:#fff; background:#999; text-decoration:none; }
+p.memberInfoBt a:hover	{ background:#727272; }
+
+
+div.memberInfoChk ul									{ width:648px; height:100px; border:1px solid #e6e6e6; margin:0 auto 50px; padding:30px 0 0; }
+div.memberInfoChk ul li								{ padding:0 28px 30px; height:22px; position:relative; }
+div.memberInfoChk ul li a.chk						{ display:block; height:22px; line-height:22px; font-size:16px; font-weight:bold; }
+div.memberInfoChk ul li a.chk span				{ font-size:16px; color:#999; }
+div.memberInfoChk ul li a.more					{ position:absolute; top:0; right:30px; padding:0 15px 0 0; background:url(../img/etc/stepMoreArr.png) 100% 35% no-repeat; font-size:15px; color:#2a2a2a; font-weight:bold; }
+
+div.memberInfoEmail									{ border-bottom:1px solid #e6e6e6; padding:50px 0; text-align:center; }
+div.memberInfoEmail>strong						{ font-size:16px; color:#1278e1; text-decoration:underline; display:block; line-height:140%; }
+div.memberInfoEmail>span							{ font-size:16px; color:#8f8f8f; display:block; line-height:140%; }
+div.memberInfoEmail a									{ width:300px; height:60px; text-align:center; display:inline-block; background:#1278e1; margin:30px 0 0; text-decoration:none; }
+div.memberInfoEmail a span						{ height:60px; line-height:60px; font-size:18px; color:#fff; background:url(../img/etc/memberInfoEmailBul.png) 0 50% no-repeat; padding:0 0 0 35px; }
+
+
+
+p.mITitle	{font-size:18px; font-weight:bold; color:#8f8f8f; margin:5px 0; }
+
+dl.mIDl	{display:inline-block; width:420px;}
+dl.mIDl dt	{ float:left;font-weight:bold; width:38%; height:60px; line-height:60px; font-size:18px; border-bottom:1px solid #e6e6e6}
+dl.mIDl dd	{float:left; width:61%; height:60px; line-height:60px;  font-size:18px;  border-bottom:1px solid #e6e6e6}
+
+a.btn_logout		{  width:260px; height:50px; line-height:50px; margin:20px auto; text-align:center; background:#999999; font-size:17px; color:#fff !important; display:block; text-decoration:none; }
+a.btn_logout:hover				{ background:#727272; text-decoration:none; }
+a.btn_join		{  width:235px; height:50px; line-height:50px; margin:15px auto; text-align:center;  font-size:17px; color:#fff !important; display:block; text-decoration:none; background:#1278e1 url(../img/etc/joinBtnbg.png) 45px center no-repeat;  padding-left:25px;}
+a.btn_join:hover				{ background:#2a4f74 url(../img/etc/joinBtnbg.png) 45px center no-repeat; text-decoration:none; }
+
+
+div.mI ul{height:100px;}
+
+div.memberInfo1{margin:40px auto 0; padding:20px 0; border-bottom:1px solid #E9E9E9; }
+p.mITitle_blue{text-align:center; color:#1278E1; font-size:17px; text-decoration:underline; line-height:1.5;}
+p.mITitle_gray{text-align:center; color:#8f8f8f; font-size:17px; line-height:1.5;}
+
+/*201500825 step3,4추가*/
+.memberStepNew{border-bottom:1px solid #e6e6e6; height:78px;}
+.memberStepNew li{float:left; width:50%; font-size:15px; line-height:74px; text-align:center; padding:0 0 4px;}
+
+.memberStepNew li>span{ padding:0 6px 0 0; display:block; height:74px; background:url(../img/etc/stepbg.png) 100% 50% no-repeat; background-size:9px 18px; }
+.memberStepNew li:last-child>span{background:none;}
+.memberStepNew li.on{padding:0; border-bottom:4px solid #343434;}
+
+.memberStepNew li.step3>span>span	{ background:url(../img/etc/step3_off.png) 0 center no-repeat; background-size:24px 27px;   padding:10px 0 10px 34px; font-size:15px; line-height:74px; color:#8f8f8f;}
+.memberStepNew li.step4>span>span	{ background:url(../img/etc/step4_off.png) 0 center no-repeat; background-size:24px 27px;  padding:10px 0 10px 34px; font-size:15px; line-height:74px; color:#8f8f8f;}
+.memberStepNew li.step3.on>span>span	{ background:url(../img/etc/step3.png) 0 center no-repeat; background-size:24px 27px;   padding:10px 0 10px 34px; font-size:15px; line-height:74px; color:#343434;}
+.memberStepNew li.step4.on>span>span	{ background:url(../img/etc/step4.png) 0 center no-repeat; background-size:24px 27px;  padding:10px 0 10px 34px; font-size:15px; line-height:74px; color:#343434}
+
+
+/*정보수정 버튼*/
+.memberInfo_modify						{width:100%; height:100px; text-align:center; line-height:100px;}
+.memberInfo_modify a.info_modify		{display:inline-block; font-size:16px; font-weight:bold; width:190px; height:50px; margin-right:10px;
+										border:2px solid #000; background-color:#fff; line-height:50px; text-align:center;}
+.memberInfo_modify a.info_modify:hover {background:#f5f5f5; text-decoration:none; color:#000;}
+
+.memberInfo_modify a.pw_modify			{display:inline-block; font-size:16px; font-weight:bold; width:190px; height:50px;
+										border:2px solid #1278e1; color:#fff; background-color:#1278e1; line-height:50px; text-align:center;}
+.memberInfo_modify a.pw_modify:hover	{background:#2a4f74; color:#fff; text-decoration:none;}
+
+
+/*회원탈퇴 버튼*/
+.memberL								{width:100%; height:70px;}
+.memberL a.memberLbtn					{font-size:16px; font-weight:bold; display:inline-block; margin:0 60px;}
+.memberL a.memberLbtn:hover				{text-decoration:underline; color:#343434;}
+
+
+/*내정보 수정*/
+
+div.certi2							{width:440px; height:210px; margin:20px  auto;  display:inline-block; border-bottom:1px solid #e6e6e6;}
+div.certi2>strong				{ font-size:18px; color:#2a2a2a; display:inline-block; padding:0 0 15px; font-weight:bold;}
+div.certi2 p							{ margin:0 0 10px; display:inline-block; width:100%; }
+div.certi2 p span				{ width:293px; float:left; border:1px solid #d4d4d4; }
+div.certi2 p a.pn					{ color:#393d4c; font-size:15px; text-align:center; height:48px; line-height:48px; width:132px; border:1px solid #393d4c; float:right; }
+div.certi2 p a.pn:hover		{ background:#f5f5f5; text-decoration:none; }
+div.certi2 p a.an					{ color:#fff; font-size:15px; text-align:center; height:50px; line-height:50px; width:134px;  float:right; background:#1278e1; }
+div.certi2 p a.an:hover		{ background:#2a4f74; text-decoration:none; }
+div.certi2 input					{ width:100%; height:48px; line-height:48px; border:0; font-size:18px; /*color:#dbdbdb; */text-indent:20px; }
+div.certi2 input.it.id			{ background:url(../img/etc/loginId.png) 94% 50% no-repeat; }
+div.certi2 input.it.pw			{ background:url(../img/etc/loginPw.png) 93.5% 50% no-repeat; }
+div.certi2 span.time			{ display:inline-block; padding:10px 0 0 0; color:#ec4949; font-size:15px; font-weight:bold; }
+
+dl.mIDl2		{display:inline-block; width:420px;}
+dl.mIDl2 dt		{ float:left;font-weight:bold; width:38%; height:60px; line-height:60px; font-size:18px; border-bottom:1px solid #e6e6e6;}
+dl.mIDl2 dd		{float:left; width:61%; height:60px; line-height:60px;  font-size:18px;  border-bottom:1px solid #e6e6e6;}
+
+p.area2			{display:inline-block; width:420px; height:70px; border-bottom:1px solid #e6e6e6;}
+p.area2	span	{float:left; width:156px; height:48px; line-height:48px; text-indent:20px; background:#f0f0f0; font-size:18px; color:#8f8f8f; 
+					border:1px solid #d4d4d4; border-right:0;}
+	
+p.area2 select{width:263px; height:50px; padding:10px 0; border:1px solid #d4d4d4; font-size:18px; float:right;}
+
+.btnBox_info	{width:100%; height:130px; text-align:center; line-height:100px;}
+.btnBox_info a.btn_blue	{display:inline-block; font-size:16px; font-weight:bold; width:200px; height:50px; border:2px solid #1278e1; color:#fff;
+							background-color:#1278e1; line-height:50px; text-align:center;}	
+
+.btnBox_info a.btn_gray	{display:inline-block; font-size:16px; font-weight:bold; width:200px; height:50px; border:2px solid #8f8f8f; color:#fff;
+							background-color:#8f8f8f; line-height:50px; text-align:center; margin:0 5px 0 5px;}	
+
+/*비밀번호 변경*/
+div.certi3						{width:400px; height:280px; margin:20px auto;  display:inline-block; border-bottom:1px solid #e6e6e6;}
+div.certi3>strong				{font-size:16px; color:#2a2a2a; display:inline-block; padding:30px 0px 20px; font-weight:bold; }
+div.certi3 p					{ margin:0 0 10px; width:100%; display:inline-block; background-color:red;}
+div.certi3 p span				{ width:400px; border:1px solid #d4d4d4; display:inline-block; }
+div.certi3 input				{ width:100%; height:52px; line-height:52px; border:0; font-size:18px; /*color:#dbdbdb; */text-indent:20px;}
+
+.btnBox_info2	{width:100%; height:150px; text-align:center; line-height:100px;}
+.btnBox_info2 a.btn_blue	{display:inline-block; font-size:16px; font-weight:bold; width:190px; height:50px; border:2px solid #1278e1; color:#fff;
+							background-color:#1278e1; line-height:50px; text-align:center; margin-right:5px;}	
+
+.btnBox_info2 a.btn_gray	{display:inline-block; font-size:16px; font-weight:bold; width:190px; height:50px; border:2px solid #8f8f8f; color:#fff;
+							background-color:#8f8f8f; line-height:50px; text-align:center; margin:0 2px 0 0px;}	
+
+/*비밀번호 찾기*/
+div.pw_find						{margin:0 164px; height:400px;}
+div.pw_find	 p.email			{margin:10px 0 50px 0; display:inline-block; width:100%; text-align:center;}
+div.pw_find	 p.email span		{width:300px;}
+div.pw_find	 p.email span input	{width:300px; height:48px; line-height:48px; font-size:18px; text-indent:20px;}
+div.pw_find	p.tit				{padding:48px 0; text-align:center; font-size:24px; height:50px;}
+div.pw_find	strong				{font-size:16px; color:#2a2a2a; display:inline-block; font-weight:bold; width:100%; text-align:center;}
+
+p.tit2			{padding:48px 0; text-align:center; font-size:24px; height:50px;}
+
+
+/*휴대폰 번호로 비밀번호 찾기*/
+/*step1*/
+ul.pw_find1_1				{border-bottom:1px solid #e6e6e6; height:74px;}
+ul.pw_find1_1 li			{float:left; width:33%; font-size:15px; line-height:74px; text-align:center;}
+ul.pw_find1_1 li.pf1_1			{padding:0; border-bottom:4px solid #343434;}
+ul.pw_find1_1 li>span.stepbg_off		{padding:0 6px 0 0; display:block; height:74px; background:url(../img/etc/stepbg_off.png)100% 50% no-repeat; background-size:9px 18px;}
+ul.pw_find1_1 li.pf1_1 span.stepbg	{padding:0 6px 0 0; display:block; height:74px; background:url(../img/etc/stepbg.png)100% 50% no-repeat; background-size:9px 18px;}
+ul.pw_find1_1 li.pf1_1 span.stepbg	span {background:url(../img/etc/step1.png)0 top no-repeat; background-size:34px 33px; padding:10px 0 10px 39px; font-size:15px;
+											line-height:74px; color:#343434;}
+ul.pw_find1_1 li.pf1_2>span>span	{background:url(../img/etc/step3_off.png)0 center no-repeat; background-size:24px 27px; padding:10px 0 10px 34px; font-size:15px;
+											line-height:74px; color:#343434;}
+ul.pw_find1_1 li.pf1_3>span>span	{background:url(../img/etc/step2off.png)0 top no-repeat; background-size:34px 33px; padding:10px 0 10px 39px; font-size:15px;
+											line-height:74px; color:#343434;}
+
+/*step2*/
+ul.pw_find1_2				{border-bottom:1px solid #e6e6e6; height:74px;}
+ul.pw_find1_2 li			{float:left; width:33%; font-size:15px; line-height:74px; text-align:center;}
+ul.pw_find1_2 li.pf1_2			{padding:0; border-bottom:4px solid #343434;}
+ul.pw_find1_2 li>span.stepbg_off		{padding:0 6px 0 0; display:block; height:74px; background:url(../img/etc/stepbg_off.png)100% 50% no-repeat; background-size:9px 18px;}
+ul.pw_find1_2 li.pf1_2 span.stepbg	{padding:0 6px 0 0; display:block; height:74px; background:url(../img/etc/stepbg.png)100% 50% no-repeat; background-size:9px 18px;}
+ul.pw_find1_2 li.pf1_2 span.stepbg	span {background:url(../img/etc/step3.png)0 center no-repeat; background-size:24px 27px; padding:10px 0 10px 34px; font-size:15px;
+											line-height:74px; color:#343434;}
+ul.pw_find1_2 li.pf1_1>span>span	{background:url(../img/etc/step1off.png)0 top no-repeat; background-size:34px 33px; padding:10px 0 10px 39px; font-size:15px;
+											line-height:74px; color:#343434;}
+ul.pw_find1_2 li.pf1_3>span>span	{background:url(../img/etc/step2off.png)0 top no-repeat; background-size:34px 33px; padding:10px 0 10px 39px; font-size:15px;
+											line-height:74px; color:#343434;}
+
+/*step3*/
+ul.pw_find1_3				{border-bottom:1px solid #e6e6e6; height:74px;}
+ul.pw_find1_3 li			{float:left; width:33%; font-size:15px; line-height:74px; text-align:center;}
+ul.pw_find1_3 li.pf1_3			{padding:0; border-bottom:4px solid #343434; width:34%;}
+ul.pw_find1_3 li>span.stepbg_off		{padding:0 6px 0 0; display:block; height:74px; background:url(../img/etc/stepbg_off.png)100% 50% no-repeat; background-size:9px 18px;}
+ul.pw_find1_3 li.pf1_2>span>span {background:url(../img/etc/step3_off.png)0 center no-repeat; background-size:24px 27px; padding:10px 0 10px 34px; font-size:15px;
+										line-height:74px; color:#343434;}
+ul.pw_find1_3 li.pf1_1>span>span	{background:url(../img/etc/step1off.png)0 top no-repeat; background-size:34px 33px; padding:10px 0 10px 39px; font-size:15px;
+											line-height:74px; color:#343434;}
+ul.pw_find1_3 li.pf1_3>span>span	{background:url(../img/etc/step2.png)0 top no-repeat; background-size:34px 33px; padding:10px 0 10px 39px; font-size:15px;
+											line-height:74px; color:#343434;}
+
+/*이메일로 비밀번호 찾기*/
+/*step1*/
+ul.pw_find2_1				{border-bottom:1px solid #e6e6e6; height:74px;}
+ul.pw_find2_1 li			{float:left; width:50%; font-size:15px; line-height:74px; text-align:center;}
+ul.pw_find2_1 li.pf2_1			{padding:0; border-bottom:4px solid #343434;}
+ul.pw_find2_1 li>span.stepbg_off		{padding:0 6px 0 0; display:block; height:74px; background:url(../img/etc/stepbg_off.png)100% 50% no-repeat; background-size:9px 18px;}
+ul.pw_find2_1 li.pf2_1 span.stepbg	{padding:0 6px 0 0; display:block; height:74px; background:url(../img/etc/stepbg.png)100% 50% no-repeat; background-size:9px 18px;}
+ul.pw_find2_1 li.pf2_1 span.stepbg	span {background:url(../img/etc/step3.png)0 center no-repeat; background-size:24px 27px; padding:10px 0 10px 34px; font-size:15px;
+											line-height:74px; color:#343434;}
+ul.pw_find2_1 li.pf2_2>span>span	{background:url(../img/etc/step2off.png)0 top no-repeat; background-size:34px 33px; padding:10px 0 10px 39px; font-size:15px;
+											line-height:74px; color:#343434;}
+
+/*step2*/
+ul.pw_find2_2				{border-bottom:1px solid #e6e6e6; height:74px;}
+ul.pw_find2_2 li			{float:left; width:50%; font-size:15px; line-height:74px; text-align:center;}
+ul.pw_find2_2 li.pf2_2			{padding:0; border-bottom:4px solid #343434;}
+
+ul.pw_find2_2 li.pf2_1>span	{padding:0 6px 0 0; display:block; height:74px; background:url(../img/etc/stepbg_off.png)100% 50% no-repeat; background-size:9px 18px;}
+ul.pw_find2_2 li.pf2_1>span>span {background:url(../img/etc/step3_off.png)0 center no-repeat; background-size:24px 27px; padding:10px 0 10px 34px; font-size:15px;
+											line-height:74px; color:#343434;}
+ul.pw_find2_2 li.pf2_2>span>span	{background:url(../img/etc/step2.png)0 top no-repeat; background-size:34px 33px; padding:10px 0 10px 39px; font-size:15px;
+											line-height:74px; color:#343434;}

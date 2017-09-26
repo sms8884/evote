@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.RealmMapper">
+
+    <sql id="sqlSelectRealm">
+        SELECT l1.site_cd
+              ,l1.realm_cd
+              ,l1.realm_nm
+              ,l1.youth_yn
+              ,l1.adult_yn
+              ,l1.choice_cnt
+              ,l1.dp_ord
+		      ,l1.reg_date
+		      ,l1.reg_user
+		      ,l2.mgr_nm AS reg_name
+		      ,l1.mod_date
+		      ,l1.mod_user
+		FROM realm_mst l1
+		LEFT OUTER JOIN manager_mst l2
+        ON l1.reg_user = l2.mgr_seq
+        WHERE l1.site_cd = #{siteCd}
+        <if test='inItemAll == "N"'>
+            AND realm_cd != 'ALL'
+        </if>
+        ORDER BY l1.dp_ord, l1.realm_cd DESC
+    </sql>
+    
+	<select id="selectRealmList" parameterType="map" resultType="realmvo">
+	/* selectRealmList */
+	    <include refid="sqlSelectRealm" />
+	    LIMIT #{startNum}, #{endNum}
+	</select>
+	
+	<select id="selectRealmListCount" parameterType="map" resultType="int">
+	/* selectRealmListCount */
+		SELECT COUNT(*)
+		FROM (
+	        <include refid="sqlSelectRealm" />
+	    ) A
+    </select>
+    
+    <select id="selectRealmListAll" parameterType="map" resultType="realmvo">
+    /* selectRealmListAll */
+        <include refid="sqlSelectRealm" />
+    </select>
+    
+	<select id="selectRealm" parameterType="map" resultType="realmvo">
+	/* selectRealm */
+        <include refid="sqlSelectRealm" />
+    </select>
+	
+</mapper>

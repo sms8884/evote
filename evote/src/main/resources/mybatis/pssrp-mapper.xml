@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.PublicSubscriptionMapper">
+
+	<sql id="SQL_SELECT_PSSRP">
+		SELECT ps_seq,
+		       site_cd,
+		       title,
+		       op_scale,
+		       gnr_scope,
+		       gnr_scale,
+		       gnr_std,
+		       trg_scope,
+		       trg_scale,
+		       trg_std,
+		       start_date,
+		       end_date,
+		       req_dest,
+		       req_realm,
+		       req_method,
+		       ineligible_biz,
+		       biz_scale,
+		       regulation,
+		       reg_date,
+		       reg_user,
+		       mod_date,
+		       mod_user,
+		       del_yn
+		  FROM pssrp
+	</sql>
+
+	<select id="selectCurrentPssrpList" resultType="publicsubscription">
+		/* selectPssrpList */
+		<include refid="SQL_SELECT_PSSRP" />
+		 WHERE site_cd = #{siteCd}
+		   AND start_date &lt; now() 
+		   AND end_date &gt; now()
+		   AND del_yn = 'N'
+		ORDER BY reg_date DESC
+	</select>
+  
+</mapper>

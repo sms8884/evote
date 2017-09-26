@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.MenuMapper">
+
+	<select id="selectMenuList" parameterType="Map" resultType="menu">
+		/* selectMenuList */
+		SELECT t.*
+		  FROM (SELECT m.menu_id,
+		               m.menu_nm,
+		               m.menu_url,
+		               m.parent_id,
+		               vars.level,
+		               m.depth,
+		               m.dp_ord,
+		               m.use_yn AS menu_yn,
+		               map.use_yn AS map_yn,
+		               getMenuSiblingValue(m.menu_id) AS sibling_value
+		          FROM (SELECT menu_connect_by_parent() AS id, @level AS level
+		                  FROM (SELECT @start_with := (SELECT menu_id FROM menu WHERE menu_nm = #{rootMenuNm}),
+		                               @id := @start_with,
+		                               @level := 0) vars
+		                       JOIN menu
+		                 WHERE @id IS NOT NULL) vars
+		               JOIN menu m ON vars.id = m.menu_id
+		               JOIN menu_map map ON m.menu_id = map.menu_id
+		         WHERE map.role = #{role} 
+		           AND m.use_yn = 'Y' 
+		           AND map.use_yn = 'Y') t
+		ORDER BY sibling_value
+	</select>
+
+	<select id="selectMenuIdsByUrl" parameterType="String" resultType="Integer">
+		/* selectMenuIdsByUrl */
+		SELECT menu_id
+		  FROM menu
+		 WHERE menu_url = #{menuUrl}
+		ORDER BY depth DESC
+	</select>
+
+	<select id="selectBreadcrumbList" parameterType="Integer" resultType="menu">
+		/* selectBreadcrumbList */
+		<![CDATA[
+		SELECT m.menu_id,
+		       m.menu_nm,
+		       m.menu_url,
+		       m.depth
+		  FROM (SELECT @r AS menu_id,
+		               (SELECT @r := parent_id
+		                  FROM menu
+		                 WHERE menu_id = @r)
+		                  AS _PARENT_ID,
+		               @l := @l + 1 AS level
+		          FROM (SELECT @r := #{menuId}) _id, menu h
+		         WHERE @r <> 0) h
+		       JOIN menu m ON h.menu_id = m.menu_id
+		       JOIN menu_map map ON m.menu_id = map.menu_id
+		 WHERE 1 = 1 AND map.use_yn = 'Y' AND m.use_yn = 'Y' AND m.depth > 0
+		ORDER BY m.depth
+		]]>
+	</select>
+
+
+</mapper>

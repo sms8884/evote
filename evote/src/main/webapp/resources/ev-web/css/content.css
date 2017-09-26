@@ -1,0 +1,242 @@
+F@charset "utf-8";
+@import url('../../css/base.css');
+@import url('layout.css');
+@import url('eh.css');
+
+
+
+.searchTb							{ width:100%; display:inline-block; margin:0 0 20px; }
+.searchTb table						{ border-top:1px solid #00ce3d; }
+.searchTb table tr					{border-bottom:1px solid #e6e6e6; }
+.searchTb table th					{height:50px; font-size:15px; background:#f6f7fb; border-left:1px solid #e6e6e6; }
+.searchTb table td					{ text-align:left; border-left:1px solid #e6e6e6; padding: 0 10px; }
+.searchTb table td a.chk			{ display:inline-block; padding:0 0 0 33px; margin:14px 0 10px; font-size:20px; font-weight:bold; background:url(../img/common/chkOff.png) 0 20% no-repeat; }
+.searchTb table td a.chk.on			{ background:url(../img/common/chkOn.png) 0 50% no-repeat; }
+.searchTb table td a.chk:hover		{ text-decoration:none; color:#343434; }
+.searchTb table .bln				{ border-left:0; }
+
+.searchTb table td select		{ height:32px; padding:6px 0;}
+.searchTb table td input.it		{ width:521px; height:30px; line-height:30px; text-indent:20px; border:1px solid #d4d4d4; }
+.searchTb table td.committeeTime	{text-align:left; padding:0 10px;}/*위원회 활동목록 검색 박스*/	
+
+.commiteeRc					{padding:0 0 40px 0;}/*위원회 역할 구성도 이미지*/
+.committeeRf li				{line-height:170%; font-size:14px; list-style-position:inside;}/*위원회 역할 기능 테이블*/
+.commiteeR_title			{width:100%; font-size:22px; padding:15px 0; font-weight:normal;}/*위원회 역할 구성도,기능*/
+
+.businesT_search input.it{margin:0 5px;}/*사업현황 서칭 테이블 검색 박스*/
+.businesT					{ border-top:1px solid #00ce3d; }
+.businesT tr					{border-bottom:1px solid #e6e6e6; }
+.businesT th					{height:50px; width:105px; font-size:15px; background:#f6f7fb; border-left:1px solid #e6e6e6; }
+.businesT td					{ text-align:left; border-left:1px solid #e6e6e6; padding: 0 10px; }
+.businesT td a.chk			{ display:inline-block; padding:0 0 0 33px; margin:14px 0 10px; font-size:20px; font-weight:bold; background:url(../img/common/chkOff.png) 0 20% no-repeat; }
+.businesT td a.chk.on			{ background:url(../img/common/chkOn.png) 0 50% no-repeat; }
+.businesT td a.chk:hover		{ text-decoration:none; color:#343434; }
+.businesT .bln				{ border-left:0; }
+
+.wid100								{ width:100px !important;}
+.wid125								{ width:125px !important;}
+.wid131								{ width:131px !important;}
+.wid141								{ width:141px !important;}
+.wid461								{ width:461px !important; margin:0 0 0 5px;}
+.wid498								{ width:498px !important;}
+.wid248								{ width:248px !important;}
+.wid300								{ width:383px !important;}
+
+
+ul.conTab li.committeeTitle a			{font-size:18px;}
+
+ul.conTab										{ width:100%; display:inline-block; }
+ul.conTab li									{ width:178px; float:left; height:60px; margin-left:-1px; }
+ul.conTab li:first-child					{ margin-left:0; }
+ul.conTab li a								{ font-size:22px; color:#8f8f8f; height:60px; line-height:60px; border:1px solid #e6e6e6; background:#f0f0f0; text-align:center; display:block; text-decoration:none; }
+ul.conTab li a.on							{ font-weight:bold; background:#fff; border-bottom:0; color:#343434; }
+
+ul.conTab li.committeeTitle a				{font}
+
+
+/*위원회 공모 모집 공고*/
+div.committeeCt							{width:722px; height:250px; padding:20px 0 0 0; border:3px solid #1278e1;}
+div.committeeCt p.ct1					{font-size:32px; padding:20px 0; text-align:center; }
+div.committeeCt p.ct2					{font-size:17px; font-weight:bold; line-height:150%; margin:0 70px; height:120px;}
+
+div.committeeCt_app			{width:100%; height:50px; }
+/*	div.committeeCt div.committeeCt_app p {width:160px; height:38px; background-color:#000; text-align:center; float:right; 
+											 border-radius:10px; margin-right:10px;}*/
+div.committeeCt_app a		{color:#fff; line-height:38px; font-size:14px; width:190px; height:38px; background-color:#000; text-align:center; float:right; 
+											 border-radius:10px; margin-right:10px; display:inline-block;}
+div.committeeCt_app a:hover		{text-decoration:none; color:#fff; background:#393d4c;}
+
+div.committeeCt_btnBx					{width:100%; height:90px; padding:30px 0 0 0; text-align:center;}
+div.committeeCt_btnBx p					{display:inline-block;}
+div.committeeCt_btnBx p.ct_btn1			{width:100%; text-align:center;}
+div.committeeCt_btnBx p.ct_btn1	a		{width:145px; height:38px; background-color:#1278e1; color:#fff; text-align:center;
+													display:inline-block; border-radius:10px; line-height:38px; font-size:14px; letter-spacing:1px;}
+div.committeeCt_btnBx p.ct_btn1	a:hover		{text-decoration:none; color:#fff; background:#2a4f74;}
+div.committeeCt_btnBx p.ct_btn2				{width:100%; text-align:right;}	
+div.committeeCt_btnBx p.ct_btn2	a			{width:145px; height:38px; background-color:#000; color:#fff; text-align:center; 
+													display:inline-block; border-radius:10px; line-height:38px; font-size:14px; float:right;}
+div.committeeCt_btnBx p.ct_btn2	a:hover		{text-decoration:none; color:#fff; background:#393d4c;}
+
+
+/*위원회 공모 개인정보이용동의*/
+.committeeCt_step1 .title		{width:100%; height:60px; text-align:center;}
+.title p					{font-size:24px; line-height:60px;}
+.committeeCt_step1 .text		{width:648px; height:161px; padding:20px 0 0; border:1px solid #e6e6e6; margin:30px auto; text-align:center;}
+.committeeCt_step1 .text .t1	{height:50px;}
+.committeeCt_step1 .text strong	{font-size:18px; font-weight:bold;}
+.committeeCt_step1 .text span	{color:#999; font-size:16px; font-weight:bold;}
+	
+.agree_bx				{width:100%; height:190px; padding-top:50px; text-align:center;}
+.agree_y				{float:left; margin-left:400px;}
+.agree_n				{float:left; margin-left:20px;}
+.agree_bx a.chk			{display:inline-block; height:30px; font-size:16px; font-weight:bold; line-height:30px;}
+.agree_bx a.next		{display:inline-block; width:296px; height:56px; line-height:56px; text-align:center; border:2px solid #343434; font-size:18px; font-weight:bold; margin:50px auto;}
+.agree_bx a.next:hover	{text-decoration:none; background-color:}
+
+
+/*주민참여위원회 신청하기*/
+input.address_detail	{width:150px; height:32px; padding:6px 0;}
+
+
+/*신청정보 보관 주의사항*/
+.Ct_app					{height:40px;}
+.Ct_app span.red2		{color:#ff6b56; line-height:40px;}
+
+/*주민참여위원회 신청상세 버튼*/
+.Ct_btnBx			{width:200%; height:60px; padding:40px 0 0;}
+.Ct_btnBx a.delete			{width:79px; height:23px; padding:9px 0 0; text-align:center; background:#fff; font-size:14px; color:#000; 
+									display:inline-block; text-decoration:none; border:1px solid ;}
+.Ct_btnBx a.delete:hover	{background:#f5f5f5; text-decoration:none;}	
+.Ct_btnBx a.list			{width:79px; height:23px; padding:9px 0 0; text-align:center; background:#fff; font-size:14px; color:#000; 
+									display:inline-block; text-decoration:none; border:1px solid;}
+.Ct_btnBx a.list:hover		{background:#f5f5f5; text-decoration:none;}
+.Ct_btnBx a.modify			{width:79px; height:23px; padding:9px 0 0; text-align:center; background:#1278e1; font-size:14px; color:#fff; 
+									display:inline-block; text-decoration:none; border:1px solid #1278e1; margin-left:480px;}
+.Ct_btnBx a.modify:hover	{background:#2a4f74; text-decoration:none;}
+
+
+div.sort								{width:100%; display:inline-block;}
+div.sort p a							{padding:9px 24px; margin:-1px; font-size:15px; color:#999; background:#fff; border:1px solid #d4d4d4; display:block; float:left; margin:10px 0 0 0;}
+div.sort p a.on,	
+div.sort p a:hover						{background:#393d4c; border:1px solid #393d4c; color:#fff; text-decoration:none; }
+div.sort p.sNum							{ margin:25px 0 0; float:right; font-size:15px;}
+
+div.offer									{ width:100%; margin:19px 0 0; display:inline-block;}
+div.offer ul								{ width:100%; float:left; }
+div.offer ul li								{ width:314px; height:154px; padding:19px; margin:0 0 16px; border:1px solid #e6e6e6; float:left; background:#fff; }
+div.offer ul li.fR							{ float:right;}
+div.offer ul li a.title						{ height:48px; font-size:20px; font-weight:bold; overflow:hidden; display:inline-block;}
+div.offer ul li p.date						{ margin:29px 0; color:#999; font-size:18px;}
+div.offer ul li p.click						{ text-align:right;}
+div.offer ul li p.click a					{ padding:0 0 0 26px; color:#393d4c; font-size:18px; display:inline-block; margin:0 0 0 20px; }
+div.offer ul li p.click a img				{ vertical-align:middle;}
+
+div.offer ul li p.click a.ok			{ background:url(../img/sub1/ok_off.gif) 0 0 no-repeat; }
+div.offer ul li p.click a.ok.on			{ background:url(../img/sub1/ok_on.gif) 0 0 no-repeat; color:#ec4849; }
+div.offer ul li p.click a.reply			{ background:url(../img/sub1/reply.gif) 0 0 no-repeat; }
+
+
+/*갤러리*/
+table.tbG									{width:100%; border-top:1px solid #00ce3d; text-align:left;}
+div.gallery_list							{ width:100%; margin:19px 0 0; display:inline-block; border-top:1px solid #00ce3d; padding-top:15px;}
+div.gallery_list ul							{ width:100%; float:left; }
+div.gallery_list ul li						{ width:352px; height:360px; margin:0 0 16px; border:1px solid #e6e6e6; float:left; background:#fff; }
+div.gallery_list ul li.fR					{ float:right;}
+div.gallery_list ul li a.title				{ height:48px; font-size:20px; font-weight:bold; overflow:hidden; display:inline-block;  margin:30px 10px;}
+div.gallery_list ul li p.date				{ margin:10px; color:#999; font-size:18px;}
+div.gallery_list ul li a img				{ width:100%;}
+
+
+/*문의하기 서칭 박스*/
+.inquriyS										{ width:250px !important; height:31px; border:1px solid #d4d4d4; margin-left:7px;}
+
+/*문의하기 공지*/
+div.inquiry										{width:700px; height:250px; padding:10px 12px;}
+div.inquiry p.inquiryTxt						{font-size:14px; line-height:200%; margin-bottom:10px;}
+div.inquiry p.inquiryTxt span					{font-size:14px; color:#1278e1;}
+div.inquiry p.inquiryTel						{font-size:14px; color:#969696; display:inline-block; background-color:#eee; line-height:200%; border-radius:20px;}
+
+/*문의하기 처리 상태 표시*/
+.tL p.inquiryI					{width:55px; height:20px; line-height:22px; text-align:center; display:inline-block; background-color:#1278e1; color:#fff; border-radius:22px; border:0.5px solid #1278e1; margin-right:2px;}
+.tL p.inquiryE					{width:55px; height:20px; line-height:22px; text-align:center; display:inline-block; background-color:#aaa; color:#fff; border-radius:22px; border:0.5px solid #aaa; margin-right:2px;}
+.tL p.inquiryW					{width:55px; height:20px; line-height:22px; text-align:center; display:inline-block; background-color:#fff; color:#000; border-radius:22px; border:0.5px solid #ccc; margin-right:2px;}
+.tL P.inquiryL					{display:inline-block; width:12px; height:17px; margin:0 3px; vertical-align:top;}
+
+/*문의하기 수정금지 글*/
+.inquriyH{color:#aaa; font-size:14px;}
+
+/*문의하기 버튼*/
+div.inquiryBtn							{height:70px; float:right; margin-top:20px;}
+div.inquiryBtn a						{width:100px; height:30px; display:inline-block; background-color:#1278e1; 
+										color:#ffffff; font-size:14px; text-align:center; line-height:25px;}
+div.inquiryBtn a:hover					{background:#2a4f74; border:1px solid #393d4c; color:#fff; text-decoration:none;}
+
+/*문의하기STEP1*/
+.inquriy_step1							{width:768px; padding:0; border: 1px solid #e6e6e6; background-color:#fff;}
+.inquriy_step1 .title					{width:100%; height:60px; text-align:center; margin-top:20px;}
+.inquriy_step1 .title p					{font-size:24px; line-height:60px;}
+.inquriy_step1 .text					{width:648px; height:161px; padding:20px 0 0; border:1px solid #e6e6e6; margin:30px auto; text-align:center;}
+.inquriy_step1 .text .t1				{height:50px;}
+.inquriy_step1 .text strong				{font-size:18px; font-weight:bold;}
+.inquriy_step1 .text span				{color:#999; font-size:16px; font-weight:bold;}
+
+
+/*문의하기STEP2*/
+.inquriy_step2							{width:768px; padding:0; border: 1px solid #e6e6e6; background-color:#fff;}
+div.Is_step2							{padding-top:40px;}
+div.Is_step2 p.tit								{ padding:48px 0; text-align:center; font-size:24px; }
+div.Is_step2 p.birth							{ padding:0 159px 20px; }
+div.Is_step2 p.birth>strong				{ font-size:18px; color:#2a2a2a; display:block; padding:0 0 15px; }
+div.Is_step2 p.birth select				{ height:48px; line-height:48px; padding:10px 0; border:1px solid #e6e6e6; margin:0 0 0 10px; font-size:18px; color:#8f8f8f; }
+div.Is_step2 p.birth>span					{ display:block; padding:14px 0 10px; color:#ec4949; font-size:15px; font-weight:bold; }
+
+div.Is_step2 div.certi							{ padding:0 159px 50px; }
+div.Is_step2 div.certi>strong				{ font-size:18px; color:#2a2a2a; display:inline-block; padding:0 0 15px; }
+div.Is_step2 div.certi p							{ margin:0 0 10px; display:inline-block; width:100%;}
+div.Is_step2 div.certi p span				{ width:293px; padding-bottom:5px; float:left; border:1px solid #d4d4d4; }
+div.Is_step2 div.certi p a.pn					{ color:#393d4c; font-size:15px; text-align:center; height:51px; line-height:51px; width:135px; border:1px solid #393d4c; float:right; }
+div.Is_step2 div.certi p a.pn:hover		{ background:#f5f5f5; text-decoration:none; }
+div.Is_step2 div.certi p a.an					{color:#fff; font-size:15px; text-align:center; height:53px; line-height:53px; width:137px;  float:right; background:#1278e1; }
+div.Is_step2 div.certi p a.an:hover		{ background:#2a4f74; text-decoration:none; }
+div.Is_step2 div.certi input					{ width:100%; height:48px; line-height:48px; border:0; font-size:18px; /*color:#dbdbdb; */text-indent:20px; }
+div.Is_step2 div.certi input.it.id			{ background:url(../img/etc/loginId.png) 94% 50% no-repeat; }
+div.Is_step2 div.certi input.it.pw			{ background:url(../img/etc/loginPw.png) 93.5% 50% no-repeat; }
+div.Is_step2 div.certi span.time			{ display:inline-block; padding:10px 0 0 0; color:#ec4949; font-size:15px; font-weight:bold; }
+
+/*문의내용 상세보기 버튼*/
+.Iq_btnBx			{width:200%; height:60px; padding:20px 0 10px 0;}
+.Iq_btnBx a.delete			{width:79px; height:23px; padding:9px 0 0; text-align:center; background:#fff; font-size:14px; color:#000; 
+									display:inline-block; text-decoration:none; border:1px solid; margin-left:560px;}
+.Iq_btnBx a.delete:hover	{background:#f5f5f5; text-decoration:none;}	
+.Iq_btnBx a.list			{width:79px; height:23px; padding:9px 0 0; text-align:center; background:#fff; font-size:14px; color:#000; 
+									display:inline-block; text-decoration:none; border:1px solid; margin-left:320px;}
+.Iq_btnBx a.list:hover		{background:#f5f5f5; text-decoration:none;}
+
+.Iq_btnBx a.modify			{width:79px; height:23px; padding:9px 0 0; text-align:center; background:#1278e1; font-size:14px; color:#fff; 
+									display:inline-block; text-decoration:none; border:1px solid #1278e1;}
+.Iq_btnBx a.modify:hover	{background:#2a4f74; text-decoration:none;}
+
+
+
+/*사업현황 리스트*/
+div.business										{width:100%; margin:19px 0 0; display:inline-block;}
+div.business ul.businessList						{width:100%; float:left; }
+div.business ul.businessList li						{width:690px; height:154px; padding:19px; margin:0 0 16px; border:1px solid #e6e6e6; float:left; background:#fff;}
+div.business ul li a.title							{width:445px; height:20px; font-size:20px; font-weight:bold; overflow:hidden; 
+														display:inline-block; text-overflow:ellipsis; white-space:nowrap; margin:20px 0;}
+.price												{font-size:20px; margin-bottom:20px;}
+.price span											{font-weight:16px;}
+div.business ul.businessList li	 p.click a			{ padding:0 0 0 26px; color:#393d4c; font-size:18px; display:inline-block;}
+div.business ul.businessList li	 p.click a img		{ vertical-align:middle;}
+div.business ul.businessList li	 p.click a.ok.on	{ background:url(../img/sub1/ok_on.gif) 0 0 no-repeat; color:#ec4849;}
+ul.businessList li div.left							{display:inline-block; float:left; width:450px; height:154px;}
+ul.businessList li div.right						{display:inline-block; float:right;}
+
+
+/*사업현황 처리 상태 표시*/
+.businessI							{width:55px; height:20px; line-height:22px; text-align:center; display:inline-block; background-color:#1278e1; color:#fff; border-radius:22px; border:0.5px solid #1278e1; margin-right:2px;}
+.businessE							{width:55px; height:20px; line-height:22px; text-align:center; display:inline-block; background-color:#aaa; color:#fff; border-radius:22px; border:0.5px solid #aaa; margin-right:2px;}
+
+
+/**/
+.pTit2			{font-size:22px; height:40px; line-height:28px;}

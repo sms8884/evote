@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.SmsMapper">
+	<insert id="sendMsgNow" parameterType="HashMap" >
+		/* sendMsgNow */
+		INSERT INTO emaul.uds_msg (
+			MSG_TYPE
+	        , CMID
+	        , REQUEST_TIME
+	        , SEND_TIME
+	        , DEST_PHONE
+	        , SEND_PHONE
+	        , MSG_BODY
+	        , ETC1
+	        , ETC2
+	        , ETC3
+        )VALUES(
+	        0
+	        ,#{uniqueKey}
+	        , SYSDATE()
+	        , SYSDATE()
+	        , #{destNumber} 
+	        , #{sendNumber}
+	        , #{msg}
+	        , #{code}
+	        , #{key}
+	        , 'evote'
+        )
+	</insert>
+
+	<select id="checkAuth" parameterType="HashMap" resultType="HashMap">
+		/* checkAuth */
+		SELECT CMID
+		  FROM emaul.uds_msg 
+		 WHERE DEST_PHONE = #{phone}
+		   AND ETC1 = #{code} 
+		   AND ETC2 = #{key}
+		   AND REQUEST_TIME > DATE_ADD(NOW(), INTERVAL ${intAuthLimitTime} SECOND)
+	</select>
+
+	<select id="checkAuthWithDestPhone" parameterType="HashMap" resultType="HashMap">
+		/* checkAuthWithDestPhone */
+		SELECT CMID, DEST_PHONE
+		  FROM emaul.uds_msg 
+		 WHERE DEST_PHONE = #{phone}
+		   AND ETC1 = #{code} 
+		   AND ETC2 = #{key}
+	</select>
+	
+	<insert id="insertMessageSendHist">
+		/* insertMessageSendHist */
+		INSERT INTO msg_send_hist (cmid, reg_date) VALUES (#{cmid}, now())
+	</insert>
+	
+</mapper>

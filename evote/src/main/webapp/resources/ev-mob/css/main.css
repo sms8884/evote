@@ -1,0 +1,159 @@
+@charset "utf-8";
+@import url('../../css/base.css');
+@import url('layout.css');
+
+
+.mainVisual			{ position:relative; }
+.slick-list				{ position:relative; display:block; overflow:hidden; }
+.slick-slide			{ display:none; float:left; height:100%; min-height:1px; position:relative; }
+.slick-slide img		{ display:block; width:auto; max-width:100%; }
+.slick-slide img.visual			{ display:block; width:100%; max-width:100%; }
+.slick-slide span.txt				{ position:absolute; top:20%; left:50%; display:inline-block; }
+.slick-slide a							{ position:absolute; top:60%; left:50%; width:40%; display:inline-block; }
+.slick-initialized .slick-slide	{ display:block; }
+
+ul.slick-dots							{ position:absolute; bottom:12px; left:0; width:100%; text-align:center; z-index:9; }
+ul.slick-dots li						{ display:inline; padding:0 4px; }
+ul.slick-dots li button			{ width:9px; height:9px; border:0; font-size:0; text-indent:-9999px; overflow:hidden; background:url(../img/main/visualList_off.png) 0 0 no-repeat; background-size:9px 9px; }
+ul.slick-dots li.slick-active button				{ background:url(../img/main/visualList_on.png) 0 0 no-repeat; background-size:9px 9px; }
+
+
+div.mainContainer				{ background:#f7f7f7; }
+
+
+
+div.mainCon1_2	{ padding:8px 11px 4px; margin:0 0 14px; background:#fff; }
+
+div.status				{  }
+div.tabmenu			{height:42px; line-height:50px; border-bottom:1px solid #e6e6e6; margin-bottom:20px; overflow:hidden; }
+div.tabmenu ul 			{display:inline-block; }
+div.tabmenu ul li			{float:left; height:24px; padding:10px 7px; letter-spacing:-1px;}
+div.tabmenu ul li a			{font-size:14px; color:#999999;}
+div.tabmenu ul li.active	{font-weight:bold;  background:url(../img/main/m_tabUnderbar.png)no-repeat 0 bottom; color:#343434;}
+div.tabmenu ul li.active	a{color:#343434;}
+div.tabmenu a.moreBtn				{float:right; font-size:13px; color:#393d4c; margin-top:10px; padding:0 0 0 15px; background:url(../img/main/m_moreBul.png) 0 50% no-repeat; background-size:8px}
+div.tabmenu a.moreBtn:hover{text-decoration:underline; color:#343434;}
+div.tabmenu a:hover,
+div.tabmenu a:active	{text-decoration:none; color:#999999;}
+
+
+div.condition ul{}
+div.condition ul li{padding:15px 0; border-top:1px solid #e6e6e6;}
+div.condition ul li:first-child{border-top:none; padding-top:0;}
+div.condition ul li a strong{display:block; font-size:14px; font-weight:bold; margin-bottom:7px; text-overflow:ellipsis; white-space: nowrap; overflow:hidden;} 
+div.condition ul li a span{display:block; font-size:14px;  margin-bottom:7px; text-overflow:ellipsis; white-space: nowrap; overflow:hidden;} 
+div.condition ul li span.date{font-size:13px; color:#999999; }
+div.condition li a:hover{text-decoration: underline; color: #1278e1 ;}
+
+
+div.condition ul li.img		{overflow:hidden;}  
+div.condition ul li.img img 	{float:left; width:92px; margin-right:15px; border:1px solid #e6e6e6;} 
+div.condition ul li.img	 span.txt 	{float:left; width:58%; overflow:hidden; } 
+div.condition ul li.img	 span.txt  a	{font-size:14px; } 
+div.condition ul li.img	 strong.elli2	{text-overflow:ellipsis; white-space: nowrap; overflow:hidden;} 
+div.condition ul li.img	 p.elli3	{font-size:14px; text-overflow:ellipsis; white-space: nowrap; overflow:hidden;} 
+div.condition ul li.img	 p.date	{font-size:13px; color:#999999; margin-top:7px;} 
+
+
+
+div.notice								{ padding:8px 11px 4px; margin:0 0 14px; background:#fff; }
+div.notice p.tit						{ height:42px; position:relative; }
+div.notice p.tit strong			{ height:42px; line-height:42px; font-size:16px; color:#343434; font-weight:bold; }
+div.notice p.tit a.more			{ position:absolute; top:0; right:0; height:42px; line-height:42px; padding:0 0 0 13px; background:url(../img/main/moreBg.png) 0 47% no-repeat; background-size:7px 7.5px; font-size:13px; color:#393d4c; }
+div.notice ul							{ padding:0; }
+div.notice ul li						{ border-top:1px solid #e6e6e6; height:42px; width:100%; display:inline-block; position:relative; }
+div.notice ul li a					{ height:42px; line-height:42px; font-size:14px; display:block; padding:0 80px 0 0; overflow:hidden; white-space: nowrap; text-overflow: ellipsis; }
+div.notice ul li span				{ height:42px; line-height:42px; font-size:13px; color:#999; display:inline-block; position:absolute; top:0; right:0; }
+
+div.notice ul li.img					{ border-top:1px solid #e6e6e6; width:100%; height:64px; padding:15px 0; display:inline-block; }
+div.notice ul li.img a				{ font-size:14px; height:64px; display:block; padding:0; position:relative; }
+div.notice ul li.img a img		{ height:64px; max-height:100%; width:97px; float:left; border:1px solid #e6e6e6; position:absolute; top:0; left:0; }
+div.notice ul li.img span.txt	{ height:64px; float:left; position:static; padding:6px 0 0 110px; }
+div.notice ul li.img span.txt strong			{ display:block; font-size:14px; line-height:140%; height:38px; }
+div.notice ul li.img span.txt span				{ display:block; position:static; padding:0; height:14px; line-height:14px; padding:4px 0 0; }
+
+
+div.board								{ padding:8px 11px 20px; margin:0 0 14px; background:#fff; display:block; }
+div.board p.tit						{ height:42px; position:relative; }
+div.board p.tit strong			{ height:42px; line-height:42px; font-size:16px; color:#343434; font-weight:bold; }
+div.board p.tit a.more			{ position:absolute; top:0; right:0; height:42px; line-height:42px; padding:0 0 0 13px; background:url(../img/main/moreBg.png) 0 47% no-repeat; background-size:7px 7.5px; font-size:13px; color:#393d4c; }
+div.board ul							{ padding:0 0 4px; }
+div.board ul li						{ border-top:1px solid #e6e6e6; height:42px; width:100%; display:inline-block; position:relative; }
+div.board ul li a					{ height:42px; line-height:42px; font-size:14px; display:block; overflow:hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+
+ul.mainBt								{ width:100%; display:inline-block; background:#fff; }
+ul.mainBt li							{ width:25%; float:left; }
+ul.mainBt li a						{ display:block; text-align:center; font-size:12px; color:#343434; padding:52px 0 15px; border-left:1px solid #e6e6e6; }
+ul.mainBt li:first-child a			{ border-left:0; }
+ul.mainBt li a.mainBt1			{ background:url(../img/main/mainBt1_off.png) 50% 28% no-repeat; background-size:24.5px 27px; }
+ul.mainBt li a.mainBt2			{ background:url(../img/main/mainBt2_off.png) 50% 28% no-repeat; background-size:25px 27.5px; }
+ul.mainBt li a.mainBt3			{ background:url(../img/main/mainBt3_off.png) 50% 28% no-repeat; background-size:24px 28.5px; }
+ul.mainBt li a.mainBt4			{ background:url(../img/main/mainBt4_off.png) 50% 28% no-repeat; background-size:34.5px 29px; }
+ul.mainBt li a.mainBt1:hover			{ background:url(../img/main/mainBt1_on.png) 50% 28% no-repeat; background-size:24.5px 27px; }
+ul.mainBt li a.mainBt2:hover			{ background:url(../img/main/mainBt2_on.png) 50% 28% no-repeat; background-size:25px 27.5px; }
+ul.mainBt li a.mainBt3:hover			{ background:url(../img/main/mainBt3_on.png) 50% 28% no-repeat; background-size:24px 28.5px; }
+ul.mainBt li a.mainBt4:hover			{ background:url(../img/main/mainBt4_on.png) 50% 28% no-repeat; background-size:34.5px 29px; }
+
+
+
+div.openPop							{ width:80%; position:fixed; top:6%; left:10%; z-index:9999999; text-align:center; }
+
+div.openPop p						{ text-align:left; padding:10px 0 0 2px; position:relative; }
+div.openPop p label				{ color:#fff; font-size:11px; }
+div.openPop p a					{ position:absolute; top:6px; right:2px; width:40px; height:16px; background:#fff; border:1px solid #e6e6e6; text-align:center; line-height:16px; color:#343434; font-size:12px; }
+.popfade	{ background:#000; position:fixed; left:0; top:0; width:100%; height:100%; opacity:.80; z-index:999999; }
+
+div.infoNumber						{border:1px solid #000; padding:15px 0; text-align:center; background:url(../img/main/call.png) no-repeat 33% center; background-size:15px 19px; font-size:13px; font-weight:bold; padding-left:26px; margin:0 0 10px 0; cursor:pointer;}
+
+.mpopup	{ display:block;width:100%; border:1px solid #e9e9e9; border-radius:10px; background:#fff; }
+.mpTitle { padding:15px; border-bottom:1px solid #cecece; font-size:18px; text-align:left; letter-spacing:-1px;}
+.mpclose{width:18px; float:right; }
+.mpclose img{width:100%;}
+
+.mpHead { border-bottom:2px solid #000; padding:20px 0; font-size:21px; font-weight:bold; line-height:1.5; text-align:center; letter-spacing:-1px;}
+
+.mdtableWrap{margin:0 10px;}
+.mpTable {width:100%}
+.mpTable tr { margin:0 10px; border-bottom:1px solid #e9e9e9 }
+.mpTable tr:last-child{border-bottom:none;}
+.mpTable tbody tr th { padding:18px 0; font-size:15px; letter-spacing:-1px; }
+.mpTable tbody tr td { padding:18px 0 18px 5px; font-size:15px; text-align:left; letter-spacing:-1px; }
+
+
+.mdtableWrap img{width:100%;}
+
+.mpBtnBox {margin:10px; background:#1378e2; font-size:13px; font-weight:bold; padding:11px 0; text-align:center;  }
+.mpbtnTxt {color:#fff; background:url(../img/main/mpbtnImg.png)no-repeat 0 0; background-size:13px ; padding-left:20px;}
+
+	
+/*배너 슬라이딩*/
+.bannerBox	{position:relative;  padding:20px 0 10px 0; background-color:#f7f7f7;}
+.bannerBox .bxContainer	{overflow:hidden;}
+.bannerBox .bxContainer .slideList	{position:relative; width:100% !important;  }
+
+.bannerBox .bxContainer .slideList li		{position:relative; float:left; }
+.bannerBox .bxContainer .slideList li img	{ width:100%;}
+
+.bannerBox .bxControl		{position:relative; padding:10px 0; text-align:center;}
+.bannerBox .bxControl ul	{ z-index:99999; display:inline-block; width:100%; position:absolute; bottom:35px; left:0; clear:both;}
+.bannerBox .bxControl ul li	{display:inline-block; width:9px; height:11px; margin:0 6px; text-indent:-99999em;
+		background:url('../img/main/bxslideoff.png') no-repeat 0 0; background-size:9px; vertical-align:middle;}
+.bannerBox .bxControl ul li.on	{ background:url('../img/main/bxslideon.png') no-repeat 0 0; background-size:9px; }
+
+.bannerTxt{width:100%; background:#85BCF0; height:80px; text-align:center; color:#fff; padding-top:10px;}
+.bnTxt1{border:1px solid #fff; border-radius:10px; color:#fff; padding:1px 10px; font-size:11px; line-height:12px; display:inline-block; margin-right:5px;}
+.bnTxt2{font-size:14px; color:#fff; margin:3px 0; line-height:14px;}
+.bnTxt3{font-size:12px; color:#e4e4e4;  }
+
+
+/*참여예산 사업현황*/
+.txt a:hover p{text-decoration:underline; color:#1278e1;}
+.txt a:hover strong{text-decoration:underline; color:#1278e1;}
+.txt a:hover span{text-decoration:underline; color:#1278e1;}
+
+
+/* 
+input, textarea, button {-webkit-appearance:none; -moz-appearance:none; appearance:none;}
+input, textarea, button, select {-webkit-border-radius:0; -moz-border-radius:0; -o-border-radius:0; border-radius:0;}
+ */

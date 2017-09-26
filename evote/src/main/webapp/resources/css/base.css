@@ -1,0 +1,67 @@
+@font-face {
+ font-family: 'nbg';
+ font-style: normal;
+ src: url('../font/NanumBarunGothic.eot');
+ src: url('../font/NanumBarunGothic.eot?#iefix') format('embedded-opentype'),
+ url('../font/NanumBarunGothic.woff') format('woff')
+}
+
+@font-face {
+ font-family: 'nbgB';
+ font-style: normal;
+ src: url('../font/NanumBarunGothicBold.eot');
+ src: url('../font/NanumBarunGothicBold.eot?#iefix') format('embedded-opentype'),
+ url('../font/NanumBarunGothicBold.woff') format('woff')
+}
+
+header, footer, section, article, aside, nav, hgroup, details, menu, figure, figcaption				{ display: block }
+
+/* Default Style */
+*    	  	{margin:0; padding:0;}
+body		{ /*background:#fff;*/ width:100%; height:100%; }
+
+td *, div *, li *, span *, p *  {vertical-align: middle;}
+ul, ol, li						{list-style:none;}
+
+img, hr		{border:none;}
+img			{vertical-align:top; border:0px ;}
+strong		{font-weight:bold;}
+
+/* Link Style */
+a:link		{text-decoration:none; color:#343434;}
+a:visited	{text-decoration:none; color:#343434;}
+a:active	{text-decoration:none; color:#343434;}
+a:hover		{text-decoration:underline; color:#1278e1;}
+a			{   }
+/* Table Style */
+table  		{border-collapse:collapse; border-spacing:0; width:100%;}
+table td img	{vertical-align:middle;}
+
+/* tag all font-size set */
+p,div,ul,li,dl,dt,dd,ol,a,em,strong,fieldset,textarea,input,select,span,table,th,td,address,cite,
+h1,h2,h3,h4,h5,h6 {color:#343434; font-family:'nbg', sans-serif; font-size:12px; line-height:120%;}
+
+b, strong			{ font-family:'nbgB', sans-serif; }
+
+/* From Style */
+textarea	{border:1px solid #d3d0c9; padding:5px;}
+input		{vertical-align:top; }
+input.txt,
+input.text,
+input.it	{ text-indent:10px;  border:1px solid #D4D4D4; height:15px; line-height:15px;/* color:#979797;*/}
+select		{}
+hr, caption {display:none;}
+legend		{position:absolute; height:0; font-size:0px; line-height:0; overflow:hidden; text-indent:-20000px; }
+address,cite,em	{font-style:normal;}
+fieldset	{border:0; padding:0; }
+label		{cursor:pointer;}
+
+* input[type="text"]{color:#343434 !important;}
+
+button	{ border:0; background:none; cursor:pointer; }
+
+.ellipsis { white-space: nowrap; overflow: hidden; text-overflow:ellipsis;}
+
+.fade	{ display:none; background:#000; position:fixed; left:0; top:0; width:100%; height:100%; opacity:.80; z-index:9999; }
+.layer_block			{ display:none; background:#fff;  float:left; font-size:1.2em; position:fixed; top:50%; left:50%; z-index:99999; -webkit-border-radius:10px; -moz-border-radius:10px; border-radius:10px;
+}

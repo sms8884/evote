@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.ConfigMapper">
+
+	<select id="selectPushKeyListCount" parameterType="config" resultType="int">
+		/* selectPushKeyListCount */
+		SELECT count(*)
+		  FROM member_mst m
+		       LEFT OUTER JOIN member_config c
+		          ON m.user_seq = c.user_seq
+		         AND c.config_group = #{configGroup}
+		         AND c.config_code = #{configCode}
+		 WHERE m.site_cd = #{siteCd}
+		   AND m.user_stat = #{userStat}
+		   <if test="userSeq gt 0">
+		   AND m.user_seq = #{userSeq}
+		   </if>
+		   AND m.push_key IS NOT NULL
+		   AND IFNULL(c.use_yn, 'Y') = 'Y'
+	</select>
+
+	<select id="selectPushKeyList" parameterType="config" resultType="String">
+		/* selectPushKeyList */
+		SELECT m.push_key
+		  FROM member_mst m
+		       LEFT OUTER JOIN member_config c
+		          ON m.user_seq = c.user_seq
+		         AND c.config_group = #{configGroup}
+		         AND c.config_code = #{configCode}
+		 WHERE m.site_cd = #{siteCd}
+		   AND m.user_stat = #{userStat}
+		   <if test="userSeq gt 0">
+		   AND m.user_seq = #{userSeq}
+		   </if>
+		   AND m.push_key IS NOT NULL
+		   AND IFNULL(c.use_yn, 'Y') = 'Y'
+	</select>
+
+	<select id="selectPushKeyListWithConfigInfo" parameterType="config" resultType="HashMap">
+		/* selectPushKeyListWithConfigInfo */
+		SELECT m.user_seq,
+		       m.push_key,
+		       ifnull(c.config_group, #{config_group}) AS config_group,
+		       ifnull(c.config_code, #{configCode}) AS config_code,
+		       ifnull(c.use_yn, 'Y') AS use_yn
+		  FROM member_mst m
+		       LEFT OUTER JOIN member_config c ON m.user_seq = c.user_seq
+		 WHERE m.site_cd = #{siteCd}
+		   AND m.user_stat = #{userStat}
+		   <if test="userSeq gt 0">
+		   AND m.user_seq = #{userSeq}
+		   </if>
+		   AND m.push_key IS NOT NULL
+		   AND (config_group IS NULL OR config_group = #{configGroup})
+		   AND (config_code IS NULL OR config_code = #{configCode})
+	</select>
+
+	<!-- 설정 카운트 조회 -->
+	<select id="selectConfigCount" parameterType="config" resultType="int">
+		/* selectConfigCount */
+		SELECT count(*)
+		  FROM config c
+		 WHERE c.config_group = #{configGroup}
+		   AND c.config_code = #{configCode}
+		   AND c.use_yn = 'Y'
+	</select>
+	
+	<!-- 사용자 설정 목록 조회 -->
+	<select id="selectMemberConfigList" parameterType="config" resultType="config">
+		/* selectMemberConfigList */
+		SELECT c.config_group,
+		       c.config_code,
+		       c.config_name,
+		       c.config_desc,
+		       ifnull(
+		          (SELECT use_yn
+		             FROM member_config m
+		            WHERE m.config_group = c.config_group
+		              AND m.config_code = c.config_code
+		              AND m.user_seq = #{userSeq}), 'Y') AS use_yn
+		  FROM config c
+		 WHERE c.use_yn = 'Y'
+		ORDER BY c.dp_ord
+	</select>
+	
+	<!-- 사용자 설정 저장 -->
+    <insert id="saveMemberConfig" parameterType="config">
+    	/* saveMemberConfig */
+		INSERT INTO member_config
+		(
+			user_seq,
+			config_group,
+			config_code,
+			use_yn,
+			reg_user,
+			reg_date
+		)
+		VALUES 
+		(
+			#{userSeq},
+			#{configGroup},
+			#{configCode},
+			#{useYn},
+			#{userSeq},
+			now()
+		)
+		ON DUPLICATE KEY UPDATE
+			user_seq = #{userSeq},
+			config_group = #{configGroup}, 
+			config_code = #{configCode},
+			use_yn = #{useYn},
+			mod_user = #{userSeq},
+			mod_date = now()
+    </insert>
+	
+</mapper>

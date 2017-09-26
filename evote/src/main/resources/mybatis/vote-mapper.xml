@@ -1,0 +1,1224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.VoteMapper">
+	
+	<!-- 투표정보 -->
+	<select id="getVoteInfo" parameterType="HashMap" resultType="HashMap">
+	/* getVoteInfo */
+		SELECT a.vote_seq
+				, a.site_cd
+				, a.title
+				, date_format(a.start_date, '%Y%m%d%H') as start_date
+				, date_format(a.end_date, '%Y%m%d%H') as end_date			
+				, a.target_text
+				, a.target
+				, a.vote_type	
+				, a.result_dp_yn
+				, a.vote_info
+				, a.vote_result
+				, a.reg_date
+				, a.reg_user
+				, a.mod_date
+				, a.mod_user
+			<![CDATA[
+				, CASE WHEN (now() BETWEEN a.start_date AND a.end_date) THEN 'START' WHEN (a.start_date > now()) THEN 'WAIT' WHEN (a.end_date < now()) THEN 'END' END AS status
+			]]>
+				, TO_DAYS(a.end_date) - TO_DAYS(now()) AS left_day
+				, (TIMESTAMPDIFF(HOUR, now(), a.end_date )) as left_hour
+				, (SELECT COUNT(*) FROM voter_info WHERE vote_seq = a.vote_seq) as voter_count
+				<if test="phone != '' and phone != null">		     
+					, (SELECT finish_yn FROM voter_info WHERE a.vote_seq = vote_seq AND phone = #{phone}) as finish_yn
+				</if>	
+				<if test="choice_cnt != null">
+				, (SELECT SUM(choice_cnt) FROM vote_realm WHERE vote_seq = a.vote_seq AND use_yn ='Y') as choice_cnt
+				</if>			
+		FROM vote_mst a 
+		WHERE a.vote_seq = #{vote_seq}
+	</select>
+	
+	<select id = "voteItemListCount" parameterType="HashMap" resultType="int">
+		/* voteItemListCount */
+		SELECT count(*)
+		FROM vote_item a
+			<trim prefix="WHERE" prefixOverrides="AND || OR">
+				AND a.vote_seq = #{vote_seq}
+				<if test="search_realm_cd != '' and search_realm_cd != null">		                	       
+					AND a.realm_cd = #{search_realm_cd} 
+				</if>
+			</trim>
+	</select>
+	
+	<!-- 사업제안 리스트 -->
+	<select id="voteItemList" parameterType="HashMap" resultType="HashMap">
+	/* voteItemList */
+		SELECT biz_seq
+				,	vote_seq
+				,	realm_cd
+				,	biz_nm
+				,	budget
+				,	start_date
+				,	end_date
+				,	location
+				,	necessity
+				,	biz_cont
+				,	effect
+				,	dp_ord		
+				,	reg_date
+				,	reg_user
+				,	mod_date
+				,	mod_user				
+				<if test="result_dp_yn == 'Y'.toString()">
+					, (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq) as total_voter
+					, (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq AND biz_seq = a.biz_seq) as biz_voter 
+					, ROUND(( ( (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq AND biz_seq = a.biz_seq) /(SELECT COUNT(*) FROM voter_choice where vote_seq = a.vote_seq))*100),1) as biz_per
+				</if>
+				<if test="finish_yn != 'Y'.toString()">
+					, (SELECT CASE WHEN (SELECT COUNT(*) FROM voter_choice_temp WHERE vote_seq = a.vote_seq and biz_seq = a.biz_seq AND phone = #{phone} ) <![CDATA[>=]]> 1 THEN 'Y' ELSE 'N' END) as select_yn
+				</if>
+				<if test="finish_yn =='Y'.toString()">
+					, (SELECT CASE WHEN (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq and biz_seq = a.biz_seq AND phone = #{phone} ) <![CDATA[>=]]> 1 THEN 'Y' ELSE 'N' END) as select_yn
+				</if>
+				 , (SELECT fi.file_seq FROM file_info fi WHERE fi.file_grp_seq = a.biz_seq AND fi.file_grp_type = 'VOTE' AND fi.file_type = 'IMAGE' AND fi.delete_yn ='N' ORDER by fi.file_ord limit 0,1) image_fileSeq
+		FROM vote_item a
+		<trim prefix="WHERE" prefixOverrides="AND || OR">
+			AND a.vote_seq = #{vote_seq}
+			<if test="search_realm_cd != '' and search_realm_cd != null">		                	       
+				AND a.realm_cd = #{search_realm_cd} 
+			</if>
+		</trim>
+		<if test ="search_order == 'dp_ord' ">
+		 Order By dp_ord asc, biz_nm asc
+		</if>
+		<if test="result_dp_yn == 'Y'.toString()">		
+			<if test ="search_order == 'biz_per'">
+			 Order By biz_voter desc, biz_nm asc
+			</if>  
+		</if>
+	</select>
+
+
+	<!-- 사업제안 정보 -->
+	<select id="getVoteItem" parameterType="HashMap" resultType="HashMap">	
+		/* getVoteItem */
+		SELECT	biz_seq
+				,	vote_seq
+				,	realm_cd
+				,	biz_nm
+				,	budget
+				,	date_format(start_date, '%Y%m%d') as start_date
+				,	date_format(end_date, '%Y%m%d') as end_date
+				,	location
+				,	necessity
+				,	biz_cont
+				,	effect
+				,	dp_ord			
+				,	reg_date
+				,	reg_user
+				,	mod_date
+				,	mod_user	
+				<![CDATA[				
+				,	ifnull(( SELECT biz_nm FROM vote_item WHERE realm_cd = a.realm_cd AND vote_seq = a.vote_seq	AND dp_ord < a.dp_ord  ORDER BY dp_ord desc limit 1),'이전 제안이 없습니다') as pre_biz_nm
+				,	ifnull(( SELECT biz_seq FROM vote_item WHERE realm_cd = a.realm_cd AND vote_seq = a.vote_seq AND dp_ord < a.dp_ord ORDER BY dp_ord desc limit 1 ),'') as pre_biz_seq
+				,	ifnull(( SELECT biz_nm FROM vote_item WHERE realm_cd = a.realm_cd AND vote_seq = a.vote_seq	AND dp_ord > a.dp_ord  ORDER BY dp_ord ASC limit 1),'다음 제안이 없습니다') as next_biz_nm
+				,	ifnull((SELECT biz_seq FROM vote_item WHERE realm_cd = a.realm_cd AND vote_seq = a.vote_seq	AND dp_ord > a.dp_ord  ORDER BY dp_ord ASC limit 1),'') as next_biz_seq
+				]]>
+				<if test="result_dp_yn == 'Y'.toString()">			
+					, (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq) as total_voter
+					, (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq AND biz_seq = a.biz_seq) as biz_voter 
+					, ROUND(( ( (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq AND biz_seq = a.biz_seq) /(select count(*) from voter_choice where vote_seq = a.vote_seq))*100),1) as biz_per
+				</if>
+				<if test="user_seq != '' and user_seq != null">	
+					<if test="finish_yn == 'N'.toString()">
+						, (SELECT CASE WHEN (SELECT COUNT(*) FROM voter_choice_temp WHERE vote_seq = a.vote_seq and biz_seq = a.biz_seq and phone = #{phone} ) <![CDATA[>=]]> 1 THEN 'Y' ELSE 'N' END) as select_yn
+					</if>
+					<if test="finish_yn == 'Y'.toString()">
+						, (SELECT CASE WHEN (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq and biz_seq = a.biz_seq and phone = #{phone} ) <![CDATA[>=]]> 1 THEN 'Y' ELSE 'N' END) as select_yn
+					</if>
+				</if>				
+		FROM vote_item a
+		<trim prefix="WHERE" prefixOverrides="AND || OR">
+			AND a.biz_seq = #{biz_seq}	
+		</trim>
+	</select>
+	
+	<!-- 사업제안 정보 선택 제안사업정보-->
+	<select id="getSelectVoteItem" parameterType="HashMap" resultType="HashMap">
+	/* getSelectVoteItem */
+		SELECT a.biz_seq
+				, a.vote_seq
+				, a.realm_cd
+				, a.biz_nm
+				, a.budget
+				, date_format(a.start_date, '%Y%m%d') as start_date
+				, date_format(a.end_date, '%Y%m%d') as end_date
+				, a.location
+				, a.necessity
+				, a.biz_cont
+				, a.effect
+				, a.dp_ord
+				, a.image_url
+				, a.attach_url
+				, a.reg_date
+				, a.reg_user
+				, a.mod_date
+				, a.mod_user								
+				<if test="result_dp_yn == 'Y'.toString()">			
+					, (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq) as total_voter
+					, (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq AND biz_seq = a.biz_seq) as biz_voter 
+					, ROUND(( ( (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq AND biz_seq = a.biz_seq) /(select count(*) from voter_choice WHERE vote_seq = a.vote_seq))*100),1) as biz_per
+				</if>
+				<choose>
+				    <when test="finish_yn == 'Y'.toString()">
+				    <![CDATA[
+				       	, ifnull((SELECT a.biz_nm FROM vote_item a, voter_choice b WHERE a.biz_seq = b.biz_seq AND a.biz_seq = (SELECT max(biz_seq) from voter_choice WHERE phone = #{phone} AND vote_seq = #{vote_seq} and biz_seq < #{biz_seq}) and b.phone = #{phone} and a.vote_seq =#{vote_seq}),'이전 제안이 없습니다') as pre_biz_nm
+						, ifnull((SELECT a.biz_seq FROM vote_item a, voter_choice b WHERE a.biz_seq = b.biz_seq AND a.biz_seq = (SELECT max(biz_seq) from voter_choice WHERE phone = #{phone} AND vote_seq = #{vote_seq} and biz_seq < #{biz_seq}) and b.phone = #{phone} and a.vote_seq =#{vote_seq}),'') as pre_biz_seq
+						, ifnull((SELECT a.biz_nm FROM vote_item a, voter_choice b WHERE a.biz_seq = b.biz_seq AND a.biz_seq = (SELECT min(biz_seq) from voter_choice WHERE phone = #{phone} AND vote_seq = #{vote_seq} and biz_seq > #{biz_seq}) and b.phone = #{phone} and a.vote_seq =#{vote_seq}),'다음 제안이 없습니다') as next_biz_nm
+						, ifnull((SELECT a.biz_seq FROM vote_item a, voter_choice b WHERE a.biz_seq = b.biz_seq AND a.biz_seq = (SELECT min(biz_seq) from voter_choice WHERE phone = #{phone} AND vote_seq = #{vote_seq} and biz_seq > #{biz_seq}) and b.phone = #{phone} and a.vote_seq =#{vote_seq}),'') as next_biz_seq
+						, (SELECT CASE WHEN (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq AND biz_seq = a.biz_seq AND phone = #{phone} ) >= 1 THEN 'Y' ELSE 'N' END) as select_yn    
+				    ]]>
+				    </when>
+				    <otherwise>		
+				    <![CDATA[
+				    	, ifnull((SELECT a.biz_nm FROM vote_item a, voter_choice_temp b WHERE a.biz_seq = b.biz_seq AND a.biz_seq =(SELECT max(biz_seq) FROM voter_choice_temp WHERE phone = #{phone} AND vote_seq = #{vote_seq} AND biz_seq < #{biz_seq}) and b.phone = #{phone} and a.vote_seq = #{vote_seq}),'이전 제안이 없습니다') as pre_biz_nm
+						, ifnull((SELECT a.biz_seq FROM vote_item a, voter_choice_temp b WHERE a.biz_seq = b.biz_seq AND a.biz_seq =(SELECT max(biz_seq) FROM voter_choice_temp WHERE phone = #{phone} AND vote_seq = #{vote_seq} AND biz_seq < #{biz_seq}) and b.phone = #{phone} and a.vote_seq = #{vote_seq}),'') as pre_biz_seq
+						, ifnull((SELECT a.biz_nm FROM vote_item a, voter_choice_temp b WHERE a.biz_seq = b.biz_seq AND a.biz_seq =(SELECT min(biz_seq) FROM voter_choice_temp WHERE phone = #{phone} AND vote_seq = #{vote_seq} AND biz_seq > #{biz_seq}) and b.phone = #{phone} and a.vote_seq = #{vote_seq}),'다음 제안이 없습니다') as next_biz_nm
+						, ifnull((SELECT a.biz_seq FROM vote_item a, voter_choice_temp b WHERE a.biz_seq = b.biz_seq AND a.biz_seq =(SELECT min(biz_seq) FROM voter_choice_temp WHERE phone = #{phone} AND vote_seq = #{vote_seq} AND biz_seq > #{biz_seq}) and b.phone = #{phone} and a.vote_seq = #{vote_seq}),'') as next_biz_seq
+						, (SELECT CASE WHEN (SELECT COUNT(*) FROM voter_choice_temp WHERE vote_seq = a.vote_seq AND biz_seq=a.biz_seq AND user_seq = #{user_seq} ) >= 1 THEN 'Y' ELSE 'N' END) as select_yn
+						]]>			    			
+				    </otherwise>
+				</choose>		
+		FROM vote_item a 		
+			<choose>
+			    <when test="finish_yn == 'Y'.toString()">
+					, voter_choice b 
+			    </when>
+			    <otherwise>
+					, voter_choice_temp b 
+			    </otherwise>
+			</choose>
+		<trim prefix="WHERE" prefixOverrides="AND || OR">
+			AND a.biz_seq = b.biz_seq
+			AND b.phone = #{phone}
+			AND b.vote_seq = #{vote_seq}	
+			AND b.biz_seq = #{biz_seq}	
+		</trim>
+	</select>
+	
+	
+	<!-- 사업제안 투표자 정보저장 -->
+	<insert id="insertVoterInfo" parameterType="HashMap">
+		/* insertVoterInfo */
+		INSERT INTO voter_info (
+			    vote_seq
+			    , user_seq
+			    , finish_yn
+			    , phone
+			    , email
+			    , gender
+			    , region_cd
+			    , sido_nm
+			    , sgg_nm
+			    , emd_nm
+			    , age
+			    , age_group
+			    , user_type
+			    , vote_method
+			    , reg_date
+		) SELECT #{vote_seq}
+					, #{user_seq}
+					, 'Y'
+					, phone
+					, email
+					, gender
+					, region_cd
+					, sido_nm
+					, sgg_nm
+					, emd_nm
+					, (SELECT FLOOR((YEAR(MAKEDATE(0,DATEDIFF(CURDATE(),concat(a.birth_year, '0101'))))-2000)/10)*10) as age
+					, #{ageGroup}
+					, user_type
+					, #{vote_method}
+					, now()
+		FROM member_mst a
+		WHERE user_seq = #{user_seq}
+	</insert >
+	
+	<!-- 사업 제안 선택한 정보 저장 -->
+	<insert id="insertVoterChoice" parameterType="HashMap">
+	/* insertVoterChoice */
+		INSERT INTO voter_choice (
+			vote_seq
+		    , phone
+		    , biz_seq
+		    , reg_date
+		) SELECT vote_seq
+				    , phone
+				    , biz_seq
+				    , now()
+		FROM voter_choice_temp
+		WHERE vote_seq = #{vote_seq}
+		AND phone = #{phone}
+	</insert >
+	
+	<!-- 사업 제안 선택한 정보 임시 저장 -->
+	<insert id="insertVoterChoiceTemp" parameterType="HashMap">
+	/* insertVoterChoiceTemp */
+		INSERT INTO voter_choice_temp (
+			vote_seq
+		    , phone
+		    , biz_seq
+		    , reg_date
+		) VALUES (
+			#{vote_seq}
+			, #{phone}
+			, #{biz_seq}
+			, now()
+		)
+	</insert >
+	
+	
+	<!-- 사업 제안 선택한 정보 임시 저장 정보 삭제-->
+	<delete id="deleteVoterChoiceTemp" parameterType="HashMap">
+	/* deleteVoterChoiceTemp */
+		DELETE FROM voter_choice_temp
+		<trim prefix="WHERE" prefixOverrides="AND || OR">
+		<if test="phone != '' and phone != null">
+			AND phone = #{phone}	
+			<if test="vote_seq != '' and vote_seq != null">
+				AND vote_seq = #{vote_seq}		
+				<if test="biz_seq != '' and biz_seq != null">	
+					AND biz_seq = #{biz_seq}
+				</if>
+			</if>	
+		</if>
+		</trim>	
+	</delete >
+
+	
+	<!-- 투표자 정보 조회 -->
+	<select id ="getVoterInfo" parameterType="HashMap" resultType="HashMap">	
+	/* getVoterInfo */
+		SELECT vote_seq
+				, user_seq
+				, finish_yn
+				, phone
+				, email
+				, gender
+				, region_cd
+				, sido_nm
+				, sgg_nm
+				, emd_nm
+				, age
+				, age_group
+				 ,user_type
+				, vote_method
+				, reg_date
+		FROM voter_info
+		WHERE vote_seq = #{vote_seq}
+		AND phone = #{phone}
+	</select>
+	
+	
+	<!-- 사용자 결과 페이지 -->
+	<select id="getUserVoteResultList" parameterType="HashMap" resultType="HashMap">
+		/* getUserVoteResultList */
+		SELECT biz_seq
+				, vote_seq
+				, realm_name
+				, realm_cd
+				, biz_nm
+				, budget
+				, start_date
+				, end_date
+				, location
+				, necessity
+				, biz_cont
+				, effect
+				, dp_ord
+				, image_url
+				, attach_url
+				, reg_date
+				, reg_user
+				, mod_date
+				, mod_user
+		        , total_voter
+		        , biz_voter
+		        , biz_per
+		        , select_yn
+		        , @RANK := @RANK+1
+		        , case when @p_value > biz_voter then @p_rank else @RANK end AS rank
+		        , case when @p_value != biz_voter then @p_rank :=@RANK else @p_rank :=@p_rank end as prank
+		        , @p_value := biz_voter   
+		        , (SELECT fi.file_seq FROM file_info fi WHERE fi.file_grp_seq = b.biz_seq AND fi.file_grp_type = 'VOTE' AND fi.file_type = 'IMAGE' AND fi.delete_yn ='N' ORDER by fi.file_ord limit 0,1) image_fileSeq     
+		FROM ( 
+					SELECT biz_seq
+							, vote_seq
+							, ( SELECT realm_nm FROM vote_realm WHERE vote_seq = a.vote_seq and realm_cd = a.realm_cd) as realm_name
+							, realm_cd
+							, biz_nm
+							, budget
+							, start_date
+							, end_date
+							, location
+							, necessity
+							, biz_cont
+							, effect
+							, dp_ord
+							, image_url
+							, attach_url
+							, reg_date
+							, reg_user
+							, mod_date
+							, mod_user				
+							, (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq) as total_voter
+							, (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq AND biz_seq = a.biz_seq) as biz_voter 
+							, ROUND(( ( (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq AND biz_seq = a.biz_seq) /(SELECT COUNT(*) FROM voter_choice where vote_seq = a.vote_seq))*100),1) as biz_per
+							, (SELECT CASE WHEN (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq and biz_seq = a.biz_seq AND phone = #{phone} ) >= 1 THEN 'Y' ELSE 'N' END) as select_yn			
+					FROM vote_item a
+					WHERE a.vote_seq = #{vote_seq}
+					
+					<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(realm_cd)">
+					  AND a.realm_cd = #{realm_cd}
+					</if>
+					
+					Order By biz_voter desc, dp_ord asc
+					) b    
+		    		, (select @p_value:= @p_value :=0, @RANK:=0, @p_rank=0) As R	
+	</select>
+	
+	
+	<!-- 투표리스트 개수 -->
+	<select id = "voteListCount" parameterType="HashMap" resultType="int">	
+		/* voteListCount */
+		SELECT count(*) 
+		FROM (
+		<![CDATA[
+				SELECT CASE WHEN (now() BETWEEN start_date AND end_date) THEN 'START' WHEN (start_date > now()) THEN 'WAIT' WHEN (end_date < now()) THEN 'END' END AS status
+		]]>
+				FROM vote_mst a
+				WHERE site_cd = #{site_cd} 
+					AND vote_status = 'Y'
+					<if test="seach_string != null and seach_string != '' ">
+						AND  a.title LIKE CONCAT('%',#{seach_string},'%') 
+					</if>
+					<if test="forDay != null">
+						AND now() BETWEEN start_date AND date_add(end_date, INTERVAL #{forDay} DAY)
+					</if>
+		
+			) b
+		<trim prefix="WHERE" prefixOverrides="AND || OR">			
+			<if test="search_status != '' and search_status != null">
+				<if test="@com.jaha.evote.common.util.StringUtils@equals(search_status, 'START')">
+					AND b.status IN ('START', 'WAIT')
+				</if>
+				<if test="@com.jaha.evote.common.util.StringUtils@equals(search_status, 'END')">
+					AND b.status = 'END'
+				</if>
+			</if>
+		</trim>		
+	</select>
+			
+	<!-- 투표리스트 -->
+	<select id = "voteList" parameterType="HashMap" resultType="HashMap">
+		/* voteList */
+		SELECT b.* 
+		FROM (
+				SELECT vote_seq
+						, site_cd
+						, title
+						, date_format(start_date, '%Y%m%d%H') as start_date
+						, date_format(end_date, '%Y%m%d%H') as end_date	
+						, target_text
+						, target
+						, vote_type					
+						, result_dp_yn
+						, vote_info		
+						, vote_result		
+						, reg_date
+						, reg_user
+						, mod_date
+						, mod_user
+						, ( SELECT COUNT(*) FROM voter_info WHERE vote_seq = a.vote_seq AND finish_yn='Y') as voter_cnt
+						, ( SELECT group_concat(realm_nm SEPARATOR ' / ') FROM vote_realm WHERE vote_seq = a.vote_seq and use_yn ='Y') as realm_name
+						, ( SELECT COUNT(*) FROM vote_item WHERE vote_seq = a.vote_seq ) as bp_cnt
+						<![CDATA[
+							, CASE WHEN (now() BETWEEN start_date AND end_date) THEN 'START' WHEN (start_date > now()) THEN 'WAIT' WHEN (end_date < now()) THEN 'END' END AS status
+						]]>
+						, TO_DAYS(a.end_date) - TO_DAYS(now()) AS left_day
+						, (TIMESTAMPDIFF(HOUR, now(), a.end_date )) as left_hour
+						<if test="user_seq != null">
+						<![CDATA[
+						, (SELECT CASE WHEN (SELECT COUNT(*) FROM voter_info WHERE vote_seq = a.vote_seq AND phone = #{phone} ) >= 1 THEN 'Y' ELSE 'N' END) as voter_finish_yn
+						]]>				
+						</if>
+						, dp_ord
+				FROM vote_mst a
+				WHERE site_cd = #{site_cd} 
+					AND vote_status = 'Y'
+					<if test="seach_string != null and seach_string != '' ">
+						AND  a.title LIKE CONCAT('%',#{seach_string},'%') 
+					</if>
+					<if test="forDay != null">
+						AND now() BETWEEN start_date AND date_add(end_date, INTERVAL #{forDay} DAY)
+					</if>
+					
+					<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(mgmtStartDate)">
+					<![CDATA[
+					  AND start_date >= STR_TO_DATE(#{mgmtStartDate}, '%Y-%m-%d') 
+					]]>
+					</if>
+					<if test="@com.jaha.evote.common.util.StringUtils@isNotEmpty(mgmtEndDate)">
+					<![CDATA[
+					  AND end_date <= DATE_ADD(STR_TO_DATE(#{mgmtEndDate}, '%Y-%m-%d'), INTERVAL 1 DAY)
+					]]>
+					</if>
+					
+					<choose>
+						<when test='@com.jaha.evote.common.util.StringUtils@equals(withoutDpOrd, "Y")'>
+							ORDER BY reg_date DESC
+						</when>
+						<otherwise>
+							ORDER BY dp_ord ASC, reg_date DESC
+						</otherwise>
+					</choose>
+					
+			) b
+		<trim prefix="WHERE" prefixOverrides="AND || OR">
+			<if test="search_status != '' and search_status != null">
+				<if test="@com.jaha.evote.common.util.StringUtils@equals(search_status, 'START')">
+					AND b.status IN ('START', 'WAIT')
+				</if>
+				<if test="@com.jaha.evote.common.util.StringUtils@equals(search_status, 'END')">
+					AND b.status = 'END'
+					ORDER BY reg_date desc
+					LIMIT #{startNum}, #{endNum}
+				</if>
+			</if>
+		</trim>
+
+	</select>
+	
+	<!-- 투표 결과 리스트 -->
+	<select id = "voteResultList" parameterType="HashMap" resultType="HashMap">
+		/* voteResultList */
+		SELECT vote_item.biz_seq 
+					, vote_item.vote_seq
+					, vote_item.biz_nm
+					, vote_item.budget
+					, vote_item.dp_ord					
+					, SUM(CASE WHEN a.vote_method = 'MOBILE' THEN 1 ELSE 0 END) AS mobile
+					, SUM(CASE WHEN a.vote_method = 'PC' THEN 1 ELSE 0 END) AS pc
+					, ifnull(count(a.biz_seq),0) as total
+					, ifnull(ROUND((ifnull(count(a.biz_seq), 0) /(select count(*) from voter_choice where vote_seq = #{vote_seq})) * 100, 2),0) AS per 
+		FROM (SELECT vc.*
+							, vi.vote_method 
+				    FROM voter_choice vc, voter_info vi
+				    WHERE vc.phone = vi.phone
+				    AND vc.vote_seq = vi.vote_seq
+				    AND vc.vote_seq = #{vote_seq}
+				    ) a
+		RIGHT OUTER JOIN vote_item ON vote_item.biz_seq = a.biz_seq
+		WHERE vote_item.vote_seq = #{vote_seq}
+		GROUP BY vote_item.biz_seq
+		ORDER by dp_ord
+	</select>
+	
+		<!-- 투표자 엑셀 다운로드 리스트 -->
+	<select id="voterResultList" parameterType="HashMap" resultType="HashMap">
+	/* voterResultList */
+	SELECT date_format(reg_date, '%Y%m%d%H') as reg_date
+			, phone
+			, email
+			, gender
+			, emd_nm
+			, age
+			, age_group
+			, user_type
+			, vote_method
+			, ( SELECT group_concat( b.dp_ord SEPARATOR ',') 
+				 FROM ( SELECT vi.biz_seq, dp_ord, vc.phone, vc.vote_seq
+							FROM voter_choice vc, vote_item vi
+							WHERE vi.biz_seq = vc.biz_seq
+							Order by dp_ord
+							) b
+				 WHERE b.vote_seq = a.vote_seq and b.phone = a.phone 
+				 ) as biz_seq
+			, vote_seq
+			, user_seq
+	FROM voter_info a
+	WHERE vote_seq = #{vote_seq}
+	</select>
+	
+	<!-- 투표 정보 입력 -->
+	<insert id="insertVoteMst" parameterType="HashMap" useGeneratedKeys="true" keyColumn="vote_seq" keyProperty="vote_seq">
+	/* insertVoteMst */
+	INSERT INTO vote_mst(
+			site_cd
+			, title
+			, start_date
+			, end_date
+			, vote_status		
+			, target_text
+			, target
+			, vote_type	
+			, result_dp_yn
+			, vote_info
+			, vote_result
+			, reg_user
+			, reg_date
+	) VALUES (
+			#{site_cd}
+			, #{title}
+			, str_to_date(#{start_date},'%Y.%m.%d%H')
+			, str_to_date(#{end_date},'%Y.%m.%d%H')
+			, 'Y'		
+			, #{target_text}
+			, #{target}
+			, #{vote_type}			
+			, #{result_dp_yn}
+			, #{vote_info}
+			, #{vote_result}
+			, #{user_seq}
+			, now()
+	)
+	</insert>
+	
+	<!-- 투표 정보 수정 -->
+	<update id="updateVoteMst" parameterType="HashMap">
+	/* updateVoteMst */
+		UPDATE vote_mst
+		SET site_cd = #{site_cd}
+			, title = #{title}
+			, start_date = str_to_date(#{start_date},'%Y.%m.%d%H')
+			, end_date = str_to_date(#{end_date},'%Y.%m.%d%H')
+			<if test="vote_status != null and vote_status != '' ">
+			, vote_status = #{vote_status}
+			</if>		
+			, target_text = #{target_text}
+			, target = #{target}
+			, vote_type = #{vote_type}			
+			, result_dp_yn = #{result_dp_yn}
+			, vote_info = #{vote_info}
+			, vote_result = #{vote_result}			
+			, mod_user = #{user_seq}
+			, mod_date = now()
+		WHERE vote_seq = #{vote_seq}
+	</update>
+	
+	<!-- 투표 정보 삭제 또는 강제 종료 -->
+	<update id="deleteVoteMst" parameterType="HashMap">
+		/* deleteVoteMst */
+		UPDATE vote_mst
+		SET mod_date = now()
+			, mod_user = #{user_seq}
+			<if test="event_type == 'DEL' ">
+				, vote_status = 'N'
+			</if>
+			<if test="event_type == 'END' ">
+				, start_date = DATE_SUB(NOW(), INTERVAL 1 DAY) 
+				, end_date = DATE_ADD(NOW(), INTERVAL -1 HOUR)
+			</if>			
+		WHERE vote_seq = #{vote_seq}
+	</update>
+	
+	
+	<!-- 투표분야 정보 등록 -->
+	<insert id="insertVoteRealm" parameterType="HashMap">
+	/* insertVoteRealm */
+		INSERT INTO vote_realm (
+				vote_seq
+			    , realm_cd
+			    , realm_nm
+			    , youth_yn
+			    , adult_yn
+			    , dp_target
+			    , choice_cnt
+			    , dp_ord
+			    , use_yn
+			    , reg_date
+			    , reg_user
+		) SELECT #{vote_seq}     
+					, realm_cd
+					, realm_nm
+					, youth_yn
+					, adult_yn
+					, dp_target
+					, choice_cnt
+					, dp_ord
+					, 'Y'
+					, now()
+					, #{user_seq}
+		FROM realm_mst
+		<trim prefix="WHERE" prefixOverrides="AND || OR">
+			AND site_cd = #{site_cd}
+			<choose>
+			    <when test="vote_type == 'ALL' ">
+					AND realm_cd = 'ALL'
+			    </when>
+			    <otherwise>
+					AND realm_cd != 'ALL'
+			    </otherwise>
+			</choose>			
+		</trim>
+	</insert>
+
+	<!-- 투표분야 마스터 리스트 -->
+	<select id="realmMastertList" parameterType="HashMap" resultType="HashMap">
+	/* realmMastertList */
+	SELECT site_cd
+	      , realm_cd
+	      , realm_nm
+	      , youth_yn
+	      , adult_yn
+	      , dp_target
+	      , choice_cnt
+	      , dp_ord
+	      , reg_date
+	      , reg_user
+	      , mod_date
+	      , mod_user
+	FROM realm_mst
+	WHERE site_cd = #{site_cd}
+		AND realm_cd != 'ALL'
+	ORDER BY dp_ord ASC
+	</select>
+	
+	
+	<!-- 투표분야마스터 정보 추가 -->
+	<insert id="addRealmMaster" parameterType="HashMap">
+	/* addRealmMaster */
+	INSERT INTO realm_mst (
+				realm_cd
+				, site_cd
+			    , realm_nm
+			    , youth_yn
+			    , adult_yn
+			    , choice_cnt
+			    , dp_ord			 
+			    , reg_date
+			    , reg_user
+			    , dp_target
+		) VALUES (	
+				<choose>
+				    <when test="realm_cd  == '' or realm_cd == null">
+						 (SELECT ifnull(MAX(a.realm_cd),0) +1 FROM realm_mst a WHERE a.site_cd = #{site_cd} AND realm_cd != 'ALL')		
+				    </when>
+				    <otherwise>
+						 #{realm_cd}	
+				    </otherwise>
+				</choose>					 
+				, #{site_cd}				
+			    , #{realm_nm}
+			    , #{youth_yn}
+			    , #{adult_yn}
+			    , #{choice_cnt}
+			    , 100			    
+			    , now()
+			    , #{user_seq}
+			    , #{dp_target}
+		)
+		ON DUPLICATE KEY 
+		UPDATE realm_nm = #{realm_nm}
+			    , youth_yn = #{youth_yn}			    
+			    , adult_yn = #{adult_yn}			        
+			    , mod_date = now()
+			    , mod_user = #{user_seq}
+			    , choice_cnt = #{choice_cnt}			 
+			    , dp_target = #{dp_target}
+	</insert>
+	
+		<!-- 분야 삭제-->
+	<delete id="deleteRealmMst" parameterType="HashMap">
+	/* deleteRealmMst */
+		DELETE FROM realm_mst
+		<trim prefix="WHERE" prefixOverrides="AND || OR">
+			AND site_cd = #{site_cd}		
+			AND realm_cd = #{realm_cd}
+		</trim>	
+	</delete >
+	
+	<!-- 분야 순서조정 -->
+	<update id="ChOrderRealmMaster" parameterType="HashMap">
+	/* ChOrderRealmMaster */
+	UPDATE realm_mst
+	SET dp_ord = #{dp_ord}
+	WHERE site_cd = #{site_cd}
+	AND realm_cd = #{realm_cd}
+	</update>
+	
+	
+	<!-- 투표분야 정보 추가 -->
+	<insert id="addVoteRealm" parameterType="HashMap">
+		/* addVoteRealm */
+		INSERT INTO vote_realm (
+			    realm_cd
+				, vote_seq
+			    , realm_nm
+			    , youth_yn
+			    , adult_yn
+			    , dp_target
+			    , choice_cnt
+			    , dp_ord
+			    , use_yn
+			    , reg_date
+			    , reg_user
+		) VALUES (		
+			<choose>
+			    <when test="realm_cd  == '' or realm_cd == null">
+					 (SELECT ifnull(MAX(a.realm_cd),0) +1 FROM vote_realm a WHERE a.vote_seq = #{vote_seq} AND realm_cd != 'ALL')		
+			    </when>
+			    <otherwise>
+					 #{realm_cd}	
+			    </otherwise>
+			</choose>		
+				, #{vote_seq}
+			    , #{realm_nm}
+			    , #{youth_yn}
+			    , #{adult_yn}
+			    , #{dp_target}
+			    , #{choice_cnt}
+			    , 100
+			    , #{use_yn}
+			    , now()
+			    , #{user_seq}
+		)
+		ON DUPLICATE KEY 
+		UPDATE vote_seq = #{vote_seq}
+		    , realm_nm = #{realm_nm}
+		    , youth_yn = #{youth_yn}
+		    , adult_yn = #{adult_yn}
+		    , mod_date = now()
+		    , mod_user = #{user_seq}
+		    , choice_cnt = #{choice_cnt}
+		    , use_yn = #{use_yn}		  
+		    <if test='use_yn == "N"'>
+		      , dp_ord = 100
+		    </if>		  
+		    , dp_target = #{dp_target}
+	</insert>
+	
+	<!-- 분야 삭제-->
+	<delete id="deleteVoteRealm" parameterType="HashMap">
+			/* deleteVoteRealm */
+		DELETE FROM vote_realm
+		<trim prefix="WHERE" prefixOverrides="AND || OR">
+			AND vote_seq = #{vote_seq}		
+			AND realm_cd = #{realm_cd}
+		</trim>	
+	</delete >
+	
+	<!-- 투표분야 리스트 -->
+	<select id="voteRealmList" parameterType="HashMap" resultType="HashMap">
+		/* voteRealmList */
+		SELECT a.vote_seq
+					, a.realm_cd
+					, a.realm_nm
+					, a.youth_yn
+					, a.adult_yn
+					, a.dp_target
+					, a.choice_cnt
+					, a.dp_ord
+					, a.use_yn
+					, a.reg_date
+					, a.reg_user
+					, a.mod_date
+					, a.mod_user
+					, (SELECT COUNT(*) FROM vote_item WHERE vote_seq = a.vote_seq AND realm_cd = a.realm_cd) AS item_cnt
+		FROM vote_realm a
+		<trim prefix="WHERE" prefixOverrides="AND || OR">
+			AND a.vote_seq = #{vote_seq}		
+			<if test="chOrd == 'yes' ">
+				AND a.use_yn = 'Y'
+			</if>
+		</trim> 
+		ORDER BY a.use_yn DESC, a.dp_ord ASC
+	</select>
+	
+	
+
+	
+	<!-- 투표분야 순서조정 -->
+	<update id="chOrderVoteRealm" parameterType="HashMap">
+		/* chOrderVoteRealm */
+		UPDATE vote_realm
+			SET dp_ord = #{dp_ord}
+		WHERE vote_seq = #{vote_seq}	
+			AND realm_cd = #{realm_cd}	
+	</update>
+	
+	
+	
+	<!-- 사업아이템, 분야리스트 -->
+	<select id="VoteItemWithRealmList" parameterType="HashMap" resultType="HashMap">
+	/* VoteItemWithRealmList */
+		SELECT a.biz_seq
+				, a.vote_seq
+				, a.biz_nm
+				, a.dp_ord
+				, a.realm_cd
+				, a.effect
+				, a.biz_cont
+				, a.necessity
+				, a.location
+				, a.start_date
+				, a.end_date
+				, a.budget
+				, a.mod_user
+				, a.mod_date
+				, a.reg_user
+				, a.reg_date
+				, a.attach_url
+				, a.image_url
+				, b.realm_nm
+		FROM vote_item a , vote_realm b
+		WHERE a.vote_seq = b.vote_seq
+			AND a.realm_cd = b.realm_cd
+			AND a.vote_seq = #{vote_seq}
+			<if test="search_realm_cd != '' and search_realm_cd != null">		
+				AND a.realm_cd = #{search_realm_cd}
+			</if>
+			<if test="search_string != '' and search_string != null">		                	       
+				AND a.biz_nm = #{search_string} 
+			</if>
+		ORDER BY a.dp_ord
+	</select>
+	
+	<!-- 투표사업 정보 입력 -->
+	<insert id="insertVoteItem" parameterType="HashMap" useGeneratedKeys="true" keyColumn="biz_seq" keyProperty="biz_seq">
+		/* insertVoteItem */
+		INSERT INTO vote_item(
+				vote_seq
+				, realm_cd
+				, biz_nm
+				, budget
+				, start_date
+				, end_date
+				, location
+				, necessity
+				, biz_cont
+				, effect
+				, dp_ord
+				, reg_date
+				, reg_user		
+		)VALUES (
+			#{vote_seq}
+			, #{realm_cd}
+			, #{biz_nm}
+			, #{budget}
+			, str_to_date(#{start_date}, '%Y.%m.%d')
+			, str_to_date(#{end_date}, '%Y.%m.%d')
+			, #{location}
+			, #{necessity}
+			, #{biz_cont}
+			, #{effect}
+			, (SELECT ifnull(max(dp_ord),0) +1 FROM vote_item a WHERE a.vote_seq = #{vote_seq})
+			, now()
+			, #{user_seq}
+		)
+	</insert>
+	
+	<!-- 투표사업 정보 업데이트 -->
+	<update id="updateVoteItem" parameterType="HashMap">
+	/* updateVoteItem */
+		UPDATE vote_item
+		SET realm_cd = #{realm_cd}
+			, biz_nm = #{biz_nm}
+			, budget = #{budget}
+			, start_date = str_to_date(#{start_date},'%Y.%m.%d')
+			, end_date = str_to_date(#{end_date},'%Y.%m.%d')
+			, location = #{location}
+			, necessity = #{necessity}
+			, biz_cont = #{biz_cont}
+			, effect = #{effect}
+			, mod_date = now()
+			, mod_user = #{user_seq}
+		WHERE biz_seq = #{biz_seq}
+	</update>
+	
+	<!-- 투표 사업 삭제-->
+	<delete  id="deleteVoteItem" parameterType="HashMap">
+		/* deleteVoteItem */
+		DELETE FROM vote_item
+		WHERE biz_seq = #{biz_seq}
+	</delete>
+	
+	<!-- 투표 사업 순서조정 -->
+	<update id="ChOrderVoteItem" parameterType="HashMap">
+	/* ChOrderVoteItem */
+	UPDATE vote_item
+	SET dp_ord = #{dp_ord}
+	WHERE biz_seq = #{biz_seq}
+	</update>
+	
+	<!-- 사용자 투표분야 리스트 -->
+	<select id="getUserVoteRealmList" parameterType="HashMap" resultType="HashMap">		
+		/* getUserVoteRealmList */
+			SELECT a.realm_cd
+					    , a.vote_seq
+					    , a.use_yn
+					    , a.dp_ord
+					    , a.dp_target
+					    , a.choice_cnt
+					    , a.adult_yn
+					    , a.youth_yn
+					    , a.realm_nm  
+					    , ifnull(b.cnt,0) as sel_cnt
+					    , (SELECT COUNT(*) FROM vote_item WHERE vote_seq = #{vote_seq} AND realm_cd = a.realm_cd) as item_cnt
+			FROM vote_realm a
+				LEFT OUTER JOIN ( SELECT COUNT(vc.biz_seq) as cnt
+													, vc.phone
+													, vi.realm_cd 
+											FROM <if test="finish_yn == 'Y'.toString()"> voter_choice vc  </if>
+													<if test="finish_yn == 'N'.toString()">  voter_choice_temp vc  </if>
+												INNER JOIN vote_item vi  
+													ON (vc.vote_seq = vi.vote_seq) AND (vc.biz_seq = vi.biz_seq)
+											WHERE vc.vote_seq = #{vote_seq} 
+												AND vc.phone = #{phone}
+											GROUP BY vi.realm_cd
+									) b
+				ON a.realm_cd = b.realm_cd 
+			WHERE a.vote_seq = #{vote_seq}
+				AND a.use_yn ='Y'
+				AND (a.dp_target = 'ALL' OR a.dp_target = #{ageGroup} )
+			ORDER BY a.dp_ord
+	</select>
+	
+		<!-- 사용자 투표 >상세 해당분야 정보 -->
+	<select id="getUserVoteRealm" parameterType="HashMap" resultType="HashMap">		
+		/* getUserVoteRealm */
+		SELECT vr.realm_nm
+				, vi.vote_seq
+				, vi.realm_cd
+				, vc.phone
+				, count(vc.biz_seq) as sel_cnt
+				, vr.choice_cnt
+		FROM ( vote_realm vr INNER JOIN vote_item vi ON (vr.vote_seq = vi.vote_seq) AND (vr.realm_cd = vi.realm_cd) )
+				INNER JOIN <if test="finish_yn == 'Y'.toString()"> voter_choice vc </if>
+								<if test="finish_yn == 'N'.toString()"> voter_choice_temp vc </if>
+					ON (vc.vote_seq = vi.vote_seq) AND (vc.biz_seq = vi.biz_seq)
+		WHERE (vi.realm_cd = #{search_realm_cd}) 
+		    AND (vi.vote_seq = #{vote_seq})
+		    AND (vc.phone = #{phone})
+		    
+	</select>
+	
+	<!-- 선택항목 조회 (해당투표의 필수 분야 sum개수와 사용자의 선택 개수 조회)-->
+	<select id="getVoteTabCnt" parameterType="HashMap" resultType="HashMap">
+	/* getVoteTabCnt */
+	  SELECT 
+			( SELECT count(*) 
+				FROM vote_item 
+				WHERE vote_seq = #{vote_seq}  
+					AND realm_cd IN( SELECT realm_cd 
+											FROM vote_realm 
+											WHERE vote_seq = #{vote_seq} 
+											AND use_yn ='Y'
+												AND (dp_target = 'ALL' OR dp_target = #{ageGroup})
+											)
+			) as total_cnt
+			, ( SELECT SUM(choice_cnt) 
+				FROM vote_realm 
+				WHERE vote_seq = #{vote_seq} 
+					AND use_yn ='Y'
+					<if test="ageGroup == 'YOUNG'"> AND youth_yn = 'Y' </if> 
+					<if test="ageGroup == 'ADULT'"> AND adult_yn = 'Y' </if>
+					AND (dp_target = 'ALL' OR dp_target = #{ageGroup} )
+			) as vital_cnt
+			, ( SELECT count(*) 
+				FROM <if test="finish_yn == 'Y'.toString()">voter_choice</if>
+						<if test="finish_yn != 'Y'.toString()">voter_choice_temp</if>
+				WHERE vote_seq = #{vote_seq}  AND phone = #{phone}
+			) as user_choice_cnt
+	</select>
+	
+	
+		
+	<!-- 사업제안 저장 정보 선택 개수 -->
+	<select id="voterChoiceListCnt" parameterType="HashMap" resultType="Int">
+		/* voterChoiceListCnt */
+		SELECT count(*)
+		FROM <if test="finish_yn == 'Y'.toString()"> voter_choice </if>
+				<if test="finish_yn == 'N'.toString()">  voter_choice_temp</if>
+		WHERE phone = #{phone}
+			AND vote_seq = #{vote_seq}
+	</select>
+	
+		<!-- 사업 제안 선택  리스트-->
+	<select id="voterChoiceList" parameterType="HashMap" resultType="HashMap">
+			/* voterChoiceList */
+		SELECT a.biz_seq
+					, a.vote_seq
+					, a.realm_cd
+					, a.budget
+					, a.biz_nm
+					, a.start_date
+					, a.end_date
+					, a.location
+					, a.necessity
+					, a.biz_cont
+					, a.effect
+					, a.dp_ord
+					, a.image_url
+					, a.attach_url
+					, a.reg_date
+					, a.reg_user
+					, a.mod_date
+					, a.mod_user
+					, c.realm_nm			
+          			, c.dp_ord
+					<if test="result_dp_yn == 'Y'.toString()">
+					, (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq AND biz_seq = a.biz_seq) as biz_voter
+					, ROUND(( ( (SELECT COUNT(*) FROM voter_choice WHERE vote_seq = a.vote_seq AND biz_seq = a.biz_seq) /(SELECT COUNT(*) FROM voter_choice where vote_seq = a.vote_seq))*100),1) as biz_per
+					</if>
+					, (SELECT fi.file_seq FROM file_info fi WHERE fi.file_grp_seq = a.biz_seq AND fi.file_grp_type = 'VOTE' AND fi.file_type = 'IMAGE' AND fi.delete_yn ='N' ORDER by fi.file_ord limit 0,1) image_fileSeq
+		FROM vote_item a, vote_realm c 
+				<if test="finish_yn == 'Y'.toString()"> , voter_choice b</if>
+				<if test="finish_yn == 'N'.toString()">  , voter_choice_temp b</if>
+		WHERE a.biz_seq = b.biz_seq
+			AND a.vote_seq = c.vote_seq
+			AND a.realm_cd = c.realm_cd
+			AND b.phone = #{phone}
+			AND b.vote_seq = #{vote_seq}
+		Order by b.biz_seq asc	
+	</select>
+	
+	<update id="updateVoteOrder" parameterType="Map">
+		UPDATE vote_item
+		   SET dp_ord = #{dp_ord}
+		 WHERE biz_seq = #{biz_seq}
+	</update>
+
+
+	<update id="updateResetVoteMstOrder">
+		UPDATE vote_mst
+		   SET dp_ord = NULL
+		 WHERE dp_ord IS NOT NULL
+	</update>
+
+	<update id="updateVoteMstOrder" parameterType="Map">
+		UPDATE vote_mst
+		   SET dp_ord = #{dp_ord}
+		 WHERE vote_seq = #{vote_seq}
+	</update>
+
+	<insert id="insertVisitorVoterInfo" parameterType="HashMap">
+		/* insertVisitorVoterInfo */
+		INSERT INTO voter_info 
+		(
+			    vote_seq
+			    , user_seq
+			    , finish_yn
+			    , phone
+			    , email
+			    , gender
+			    , region_cd
+			    , sido_nm
+			    , sgg_nm
+			    , emd_nm
+			    , age
+			    , age_group
+			    , user_type
+			    , vote_method
+			    , reg_date
+		) 
+		VALUES
+		(
+		 		#{vote_seq}
+				, #{user_seq}
+				, 'Y'
+				, #{phone}
+				, #{email}
+				, #{gender}
+				, #{region_cd}
+				, #{sido_nm}
+				, #{sgg_nm}
+				, #{emd_nm}
+				, (SELECT FLOOR((YEAR(MAKEDATE(0,DATEDIFF(CURDATE(),concat(#{birth_year}, '0101'))))-2000)/10)*10)
+				, #{ageGroup}
+				, #{user_type}
+				, #{vote_method}
+				, now()
+		)
+	</insert >
+
+
+	<select id="selectVoteRealmList" parameterType="Map" resultType="VoteRealm">
+		/* selectVoteRealmList */
+		SELECT vote_seq,
+		       realm_cd,
+		       realm_nm,
+		       youth_yn,
+		       adult_yn,
+		       choice_cnt,
+		       dp_target,
+		       dp_ord,
+		       use_yn,
+		       reg_date,
+		       reg_user,
+		       mod_date,
+		       mod_user
+		  FROM vote_realm
+		 WHERE vote_seq = #{voteSeq} 
+		   AND use_yn = 'Y'
+		   <if test="ageGroup != null">
+		   AND (dp_target = 'ALL' OR dp_target = #{ageGroup})
+		   </if>
+		ORDER BY dp_ord
+	</select>
+	
+	<select id="selectVoteStartSchedule" resultType="VoteMaster">
+		/* selectVoteStartSchedule */
+		SELECT vote_seq,
+		       site_cd,
+		       region_cd,
+		       title,
+		       start_date,
+		       end_date,
+		       vote_status,
+		       biz_dp_type,
+		       target,
+		       target_text,
+		       vote_type,
+		       choice_cnt,
+		       result_dp_yn,
+		       vote_info,
+		       voter_cnt,
+		       vote_result,
+		       dp_ord
+		  FROM vote_mst
+		 WHERE start_date BETWEEN DATE_ADD(now(), INTERVAL -5 MINUTE) AND DATE_ADD(now(), INTERVAL 5 MINUTE)
+	</select>
+
+	<select id="selectVoteEndSchedule" resultType="VoteMaster">
+		/* selectVoteEndSchedule */
+		SELECT vote_seq,
+		       site_cd,
+		       region_cd,
+		       title,
+		       start_date,
+		       end_date,
+		       vote_status,
+		       biz_dp_type,
+		       target,
+		       target_text,
+		       vote_type,
+		       choice_cnt,
+		       result_dp_yn,
+		       vote_info,
+		       voter_cnt,
+		       vote_result,
+		       dp_ord
+		  FROM vote_mst
+		 WHERE end_date BETWEEN DATE_ADD(now(), INTERVAL -5 MINUTE) AND DATE_ADD(now(), INTERVAL 5 MINUTE)
+	</select>
+	
+	<select id="selectMinRealmCd" resultType="String">
+		/* selectMinRealmCd */
+		SELECT min(realm_cd)
+		  FROM vote_realm
+		 WHERE vote_seq = #{vote_seq} 
+		   AND use_yn = 'Y'
+	</select>
+	
+</mapper>

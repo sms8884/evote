@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.CommitteeMapper">
+ 	
+ <select id="selectCmitContestCount" resultType="int">
+ 		/* cmitContestListCount*/
+ 		
+ 		SELECT count(*)
+ 			FROM cmit_pssrp 
+ 			WHERE del_yn = 'N'
+ 
+ </select>
+ 
+ <select id = "selectCmtiContest" parameterType="HashMap" resultType="HashMap">
+			/*selectCmtiContest*/
+	
+	SELECT ps_seq
+			, site_cd
+			, title
+			, start_date
+			, end_date
+			, del_yn
+			, reg_user
+			, reg_date
+	 FROM cmit_pssrp AS a
+	
+	WHERE site_cd = #{site_cd} AND del_yn= 'N' AND ps_seq = #{ps_seq}
+	
+	</select>
+ 
+ <select id = "selectCmtiContestReq" parameterType="HashMap" resultType="HashMap">
+			/*selectCmtiContestReq*/
+	
+	SELECT ps_seq
+			, site_cd
+			, title
+			, start_date
+			, end_date
+			, del_yn
+			, reg_user
+			, reg_date
+            ,(SELECT b.req_seq 
+              FROM
+                    cmit_pssrp_req AS b
+               WHERE     
+                    b.user_seq = ${user_seq}
+                    LIMIT 1
+                 		 ) AS reqSeq
+			, (SELECT
+					 c.file_src_nm   
+			   FROM 
+			   		file_info AS c
+      		  WHERE
+                c.file_grp_type = 'CMIT'
+                AND c.file_type = 'ATTACH'
+                AND c.delete_yn='N'
+                AND c.file_grp_seq = a.ps_seq 
+                		order by c.file_seq asc limit 1) AS fileNm
+	 FROM cmit_pssrp AS a
+	
+	WHERE site_cd = #{site_cd} AND del_yn= 'N' AND   now() >= start_date AND end_date >= now()
+	ORDER BY reg_date DESC
+	LIMIT 1
+	
+	</select>
+	
+ 	<select id = "selectCmitContestList" parameterType="HashMap" resultType="HashMap">
+			/* selectCmitContestList */
+	
+	SELECT ps_seq
+			, site_cd
+			, title
+			, start_date
+			, end_date
+			, del_yn
+			, reg_user
+			, reg_date
+			, mod_user
+			, mod_date
+			, (SELECT COUNT(*) FROM  cmit_pssrp_req AS b WHERE b.ps_seq = a.ps_seq AND b.del_yn = 'N') as cmitPssrpReqCnt
+			<if test="user_type != null and user_type != '' and user_type.equals('ADMIN')">
+			,(SELECT d.mgr_nm FROM manager_mst as d WHERE d.mgr_seq = reg_user) AS userNm  
+			</if>
+			<if test="user_type != null and user_type != '' and !user_type.equals('ADMIN')">
+			,(SELECT d.user_nm FROM member_mst as d WHERE d.user_seq = reg_user)  AS userNm
+			</if>
+			, (SELECT
+					 c.file_src_nm   
+			   FROM 
+			   		file_info AS c
+      		  WHERE
+                c.file_grp_type = 'CMIT'
+                AND c.file_type = 'ATTACH'
+                AND c.delete_yn='N'
+                AND c.file_grp_seq = a.ps_seq 
+                		order by c.file_seq asc limit 1) AS fileNm
+	 FROM cmit_pssrp AS a
+	
+	WHERE site_cd = #{site_cd} AND del_yn= 'N'
+
+					Order by ps_seq desc	   
+		 <if test="endNum != null and endNum != ''">
+	 	 LIMIT #{startNum}, #{endNum}
+	 	 </if>
+	
+	</select>
+	
+ 	<select id = "selectCmitContestReqList" parameterType="HashMap" resultType="HashMap">
+			/* selectCmitContestReqList */
+	
+	SELECT ps_seq
+			, req_seq
+			, site_cd
+			, (SELECT b.title FROM cmit_pssrp AS b WHERE b.ps_seq = a.ps_seq ) AS title
+			, (SELECT c.cd_nm FROM comm_cd AS c WHERE c.cd_id = a.subCmit1) AS subCmit1
+			, (SELECT c.cd_nm FROM comm_cd AS c WHERE c.cd_id = a.subCmit2) AS subCmit2
+			, date_format(reg_date, '%Y-%m-%d') AS reg_date
+			,(SELECT d.user_nm FROM member_mst as d WHERE d.user_seq = reg_user)  AS userNm
+	 FROM cmit_pssrp_req AS a
+	
+	WHERE site_cd = #{site_cd} AND del_yn= 'N' AND user_seq = #{user_seq}
+
+					Order by req_seq desc
+		<if test="endNum != null and endNum != ''">
+	 		 LIMIT #{startNum}, #{endNum}
+	 	 </if>
+	</select>
+ 
+	<select id = "selectCmitContestReq" parameterType="HashMap" resultType="HashMap">
+			/*selectCmitContestReq*/
+	
+	SELECT ps_seq
+			, req_seq
+			, site_cd
+			, addr1
+			, addr2
+			, phone
+			, job
+			, intro
+			, user_seq
+			, a.subCmit1 AS subCmitCd1
+			, a.subCmit2 AS subCmitCd2
+			, (SELECT c.cd_nm FROM comm_cd AS c WHERE c.cd_id = a.subCmit1) AS subCmit1
+			, (SELECT c.cd_nm FROM comm_cd AS c WHERE c.cd_id = a.subCmit2) AS subCmit2
+		    , (SELECT
+					 b.file_src_nm   
+			   FROM 
+			   		file_info AS b
+      		  WHERE
+                b.file_grp_type = 'CMIT_REQ'
+                AND b.file_type = 'ATTACH'
+                AND b.delete_yn='N'
+                AND b.file_grp_seq = a.req_seq 
+                		order by b.file_seq asc limit 1) AS attFileNm
+		    , (SELECT
+					 b.file_src_nm   
+			   FROM 
+			   		file_info AS b
+      		  WHERE
+                b.file_grp_type = 'CMIT_REQ'
+                AND b.file_type = 'IMAGE'
+                AND b.delete_yn='N'
+                AND b.file_grp_seq = a.req_seq 
+                		order by b.file_seq asc limit 1) AS imgFileNm
+			, reg_date
+	 FROM cmit_pssrp_req AS a
+	WHERE site_cd = #{site_cd} AND del_yn= 'N' AND req_seq = #{req_seq}
+					<if test="user_seq != null and user_seq != ''" >
+						AND user_seq = #{user_seq} 
+					</if>
+								 
+	
+	</select>
+ 
+ 	<insert id="insertCmitContest" parameterType="HashMap" useGeneratedKeys="true" keyProperty="cmit_seq">
+    /* insertCmitContest */
+	INSERT INTO cmit_pssrp  
+	(
+		site_cd, 
+		title,
+		end_date,
+		start_date,
+		del_yn,
+		reg_user, 
+		reg_date
+	 )
+	 VALUES 
+	 (
+			ifnull(#{site_code}, 'ep'),
+			#{title},
+			#{end_date},
+			#{start_date},
+			'N',
+			#{reg_user},
+			now()
+	 )
+	</insert>
+	
+	<update id="updateCmitContest" parameterType="HashMap">
+    /* updateCmitContest */
+	UPDATE cmit_pssrp 
+	SET
+		<if test="title != null and title != ''" >
+			title = #{title},
+		</if>
+		<if test="end_date != null and end_date != ''" >
+			end_date = #{end_date}, 
+		</if>
+		<if test="start_date  != null and start_date  != ''" >
+			start_date = #{start_date},
+		</if>
+		mod_user = #{mod_user}, 
+		mod_date =now()
+		
+		WHERE ps_seq = ${ps_seq}
+	</update>
+	
+	<update id="deleteCmitContest" parameterType="int">
+	    /* deleteCmitContest */
+		UPDATE cmit_pssrp 
+			SET
+				 del_yn = 'Y'
+		WHERE ps_seq = #{ps_seq}
+	</update>
+	
+	<update id="stopCmitContest" parameterType="int">
+	    /* stopCmitContest */
+		UPDATE cmit_pssrp 
+			SET
+				end_date = date_format(now(), '%Y%m%d'),
+				mod_user = #{mod_user}, 
+				mod_date =now()
+		WHERE ps_seq = #{ps_seq}
+	</update>
+	
+	<insert id="insertCmitContestReq" parameterType="HashMap" useGeneratedKeys="true" keyProperty="req_seq">
+    /* insertCmitContestReq */
+	INSERT INTO cmit_pssrp_req  
+	(
+		ps_seq,
+		site_cd, 
+		phone,
+		addr1,
+		addr2,
+		job,
+		subCmit1,
+		subCmit2,
+		intro, 
+		del_yn, 
+		user_seq,
+		reg_user,
+		reg_date
+	 )
+	 VALUES 
+	 (
+			#{ps_seq},
+			ifnull(#{site_code}, 'ep'),
+			#{phone},
+			#{addr1},
+			#{addr2},
+			#{job},
+			#{subCmit1},
+			#{subCmit2},
+			#{intro},
+			'N',
+			#{user_seq},
+			#{user_seq},
+			now()
+	 )
+	</insert>
+
+	<update id="deleteCmitContestReq" parameterType="int">
+    	/* deleteCmitContestReq */
+		UPDATE cmit_pssrp_req 
+			SET
+				 del_yn = 'Y'
+		WHERE req_seq = #{req_seq}
+	</update>
+	
+	<!-- 주민참여위원회 신청서   -->
+	
+	
+	<select id = "selectCmitReqCount" parameterType="HashMap" resultType="int">	
+		/* selectCmitReqCount */
+			SELECT    COUNT(*)
+			FROM
+			    member_mst AS a
+			        INNER JOIN
+			    cmit_pssrp_req AS b ON a.user_seq = b.user_seq AND b.del_yn = 'N'  AND b.ps_seq = #{ps_seq}
+				<if test="user_stat != null and user_stat != '' ">
+						AND  a.user_stat LIKE CONCAT('%',#{user_stat},'%') 
+					</if>
+
+					<if test="sub_cmit != null and sub_cmit != '' ">
+						AND  b.subcmit1 LIKE CONCAT('%',#{sub_cmit},'%') 
+					</if>
+
+					<if test="search_condition != null and search_condition != '' and search_condition == 'userNm' ">
+						AND  a.user_nm LIKE CONCAT('%',#{search_string},'%') 
+					</if>
+					<if test="search_condition != null and search_condition != '' and search_condition == 'phone' ">
+						AND  a.phone LIKE CONCAT('%',#{search_string},'%') 
+					</if>
+					<if test="endNum != null and endNum != ''">
+	 	 				LIMIT #{startNum}, #{endNum}
+				 	 </if>
+				
+				
+	</select>
+	
+	<select id = "selectAdmCmitContestReqList" parameterType="HashMap" resultType="HashMap">	
+		/* selectAdmCmitContestReqList */
+			SELECT 
+			    a.user_nm,
+			    a.user_stat,
+			    a.phone,
+			    a.email,
+			    a.gender,
+			    a.birth_year,
+			    a.birth_date,
+			    (SELECT  c.cd_nm  FROM comm_cd AS c WHERE  c.cd_id = b.subCmit1) AS subCmit1,
+			    (SELECT  c.cd_nm  FROM comm_cd AS c WHERE  c.cd_id = b.subCmit2) AS subCmit2,
+			    (SELECT  d.start_date  FROM cmit_pssrp AS d WHERE  d.ps_seq = #{ps_seq}) AS start_date,
+			    (SELECT  d.end_date  FROM cmit_pssrp AS d WHERE  d.ps_seq = #{ps_seq}) AS end_date,
+			    (SELECT  d.title  FROM cmit_pssrp AS d WHERE  d.ps_seq = #{ps_seq}) AS title,
+			    b.addr1,
+			    b.job,
+			    b.intro,
+			    b.req_seq,
+			    b.ps_seq,
+			    b.reg_date
+			FROM
+			    member_mst AS a
+			        INNER JOIN
+			    cmit_pssrp_req AS b ON a.user_seq = b.user_seq AND b.del_yn = 'N' AND b.site_cd = #{site_cd} AND b.ps_seq = #{ps_seq}
+					<if test="user_stat != null and user_stat != '' ">
+						AND  a.user_stat LIKE CONCAT('%',#{user_stat},'%') 
+					</if>
+
+					<if test="sub_cmit != null and sub_cmit != '' ">
+						AND  b.subcmit1 LIKE CONCAT('%',#{sub_cmit},'%') 
+					</if>
+
+					<if test="search_condition != null and search_condition != '' and search_condition == 'userNm' ">
+						AND  a.user_nm LIKE CONCAT('%',#{search_string},'%') 
+					</if>
+					<if test="search_condition != null and search_condition != '' and search_condition == 'phone' ">
+						AND  a.phone LIKE CONCAT('%',#{search_string},'%') 
+					</if>
+						Order by b.reg_date desc
+					<if test="endNum != null and endNum != ''">
+	 	 				LIMIT #{startNum}, #{endNum}
+				 	 </if>
+				
+	</select>
+
+	<select id="selectCmitPssrp" resultType="Map">
+		/* selectCmitPssrp */
+		SELECT ps_seq,
+		       site_cd,
+		       title,
+		       start_date,
+		       end_date,
+		       del_yn,
+		       reg_user,
+		       reg_date,
+		       mod_user,
+		       mod_date
+		  FROM cmit_pssrp
+		 WHERE site_cd = #{siteCd}
+		   AND ps_seq = #{psSeq}
+		   AND del_yn = 'N'
+	</select> 
+
+	<select id="selectCmitPssrpStartSchedule" resultType="Map">
+		/* selectCmitPssrpStartSchedule */
+		SELECT ps_seq,
+		       site_cd,
+		       title,
+		       date_format(start_date, '%Y-%m-%d') AS start_date,
+		       date_format(end_date, '%Y-%m-%d') AS end_date,
+		       del_yn,
+		       reg_user,
+		       reg_date,
+		       mod_user,
+		       mod_date
+		  FROM cmit_pssrp
+		 WHERE start_date BETWEEN DATE_ADD(now(), INTERVAL -5 MINUTE) AND DATE_ADD(now(), INTERVAL 5 MINUTE)	
+	</select>
+	
+</mapper>

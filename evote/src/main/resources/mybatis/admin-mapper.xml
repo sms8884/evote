@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jaha.evote.mapper.AdminMapper">
+
+	<resultMap id="adminMap" type="com.jaha.evote.domain.AdminUser">
+		<id property="mgrSeq" column="mgr_seq" />
+		<result property="siteCd" column="site_cd" />
+		<result property="userType" column="user_type" />
+		<result property="mgrId" column="mgr_id" />
+		<result property="mgrPw" column="mgr_pw" />
+		<result property="mgrNm" column="mgr_nm" />
+		<result property="mgrEmail" column="mgr_email" />
+		<result property="mgrNickname" column="mgr_nickname" />
+		<result property="mgrDept" column="mgr_dept" />
+		<result property="mgrTel" column="mgr_tel" />
+		<result property="useYn" column="use_yn" />
+		<result property="mailReceiveYn" column="mail_receive_yn" />
+		<result property="lastLoginDate" column="last_login_date" />
+		<result property="regDate" column="reg_date" />
+		<result property="modDate" column="mod_date" />
+		<collection property="roles" 
+					column="{mgrSeq=mgr_seq}"
+					javaType="java.util.ArrayList" 
+					ofType="com.jaha.evote.domain.type.RoleType" 
+					select="com.jaha.evote.mapper.AdminMapper.selectManagerRoles"/>
+	</resultMap>
+	
+	<sql id="SQL_SELECT_ADMIN">
+		<bind name="_USER_TYPE_ADMIN" value="@com.jaha.evote.domain.type.UserType@ADMIN" />
+		SELECT mgr_seq,
+		       site_cd,
+		       region_cd,
+		       mgr_id,
+		       mgr_pw,
+		       mgr_nm,
+		       mgr_email,
+		       mgr_nickname,
+		       mgr_dept,
+		       mgr_tel,
+		       use_yn,
+		       mail_receive_yn,
+		       last_login_date,
+		       reg_date,
+		       mod_date,
+		       #{_USER_TYPE_ADMIN} as userType
+		  FROM manager_mst
+	</sql>
+
+	<select id="selectAdminUserInfo" parameterType="String" resultMap="adminMap">
+		/* selectAdminUserInfo */
+		<include refid="SQL_SELECT_ADMIN" />
+		 WHERE mgr_id = #{mgrId}
+		   AND use_yn = 'Y'
+	</select>
+
+	<update id="updateLastLoginDate" parameterType="Map">
+		/* updateLastLoginDate */
+		update manager_mst
+		   set last_login_date = now(),
+		       login_ip = #{loginIp}
+		 where mgr_seq = #{mgrSeq}
+	</update>
+	
+	
+	<select id="selectManagerList" resultMap="adminMap">
+		/* selectManagerList */
+		<include refid="SQL_SELECT_ADMIN" />
+		 WHERE site_cd = #{siteCd}
+		   AND use_yn = 'Y'
+	</select>
+
+	<select id="selectManager" resultMap="adminMap">
+		/* selectManager */
+		<include refid="SQL_SELECT_ADMIN" />
+		 WHERE site_cd = #{siteCd}
+		   AND mgr_seq = #{mgrSeq}
+		   AND use_yn = 'Y'
+	</select>
+
+	<select id="selectMailReceiveManagerList" resultMap="adminMap">
+		/* selectMailReceiveManagerList */
+		<include refid="SQL_SELECT_ADMIN" />
+		 WHERE site_cd = #{siteCd}
+		   AND mail_receive_yn = 'Y'
+		   AND use_yn = 'Y'
+	</select>
+	
+	<insert id="insertManager" parameterType="adminuser">
+		/* insertManager */
+		INSERT INTO manager_mst
+		(
+			site_cd,
+			mgr_id,
+			mgr_pw,
+			mgr_nm,
+			mgr_email,
+			mgr_dept,
+			mgr_nickname,
+			mgr_tel,
+			use_yn,
+			mail_receive_yn
+			reg_date
+		)
+		VALUES 
+		(
+			#{siteCd},
+			#{mgrId},
+			#{mgrPw},
+			#{mgrNm},
+			#{mgrEmail},
+			#{mgrDept},
+			#(mgrNickname),
+			#{mgrTel},
+			#{mailReceiveYn}
+			'Y',
+			now()
+		)
+	</insert>
+	
+	<update id="updateManager">
+		/* updateManager */
+		UPDATE manager_mst
+		   SET mgr_email = #{mgrEmail},
+		       mgr_nm = #{mgrNm},
+		       <if test="mgrNickname != null">
+		       mgr_nickname = #{mgrNickname},
+		       </if>
+		       mgr_dept = #{mgrDept},
+		       mgr_tel = #{mgrTel},
+		       mail_receive_yn = #{mailReceiveYn},
+		       mod_date = now()
+		 WHERE mgr_seq = #{mgrSeq}
+		   AND site_cd = #{siteCd}
+	</update>
+	
+	<update id="removeManager">
+		/* removeManager */
+		UPDATE manager_mst
+		   SET use_yn = 'N',
+		       mod_date = now()
+		 WHERE site_cd = #{siteCd}
+		   AND mgr_seq = #{mgrSeq}
+	</update>
+	
+	<update id="updateManagerPasswd" parameterType="Map">
+		/* updateManagerPasswd */
+		UPDATE manager_mst
+		   SET mgr_pw = #{mgrPw},
+		       mod_date = now()
+		 WHERE site_cd = #{siteCd}
+		   AND mgr_seq = #{mgrSeq}
+	</update>
+
+	<select id="selectManagerRoles" resultType="com.jaha.evote.domain.type.RoleType">
+		/* selectManagerRoles */
+		SELECT role
+		  FROM manager_roles
+		 WHERE mgr_seq = #{mgrSeq}
+	</select>
+	
+</mapper>

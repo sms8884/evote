@@ -1,0 +1,53 @@
+@charset "utf-8";
+
+@import url('../../css/base.css');
+@import url('adminLayout.css');
+@import url('adContents.css');
+
+
+div.boardView div.bCon .imgName			{ padding:10px 0;}
+div.budgetGallary			{margin:20px 0 0 0;}
+div.boardWrite.bgTable table tr td{border-right:none !important;}
+
+div.flR	{float:right !important;}
+div.cmitBtnBox {margin:10px 0; text-align:right;}
+.committee_btn	{   border:none; padding: 9px; text-align: center; background: #999; font-size: 14px; color: #fff; display: inline-block; text-decoration: none; }
+
+div.comitteeTable table tr td{font-size:13px !important;}
+div.comitteeTable table tr th{font-size:14px !important;}
+
+div.mainContent table.comitteeTable2 tr td .fileBox{margin-top:10px;}
+
+div.mainContent table.comitteeTable2 tr td p.upload span { display: block; padding: 3px;}
+
+div.mainContent table.comitteeTable2 tr td .red2 { color: #ff6b56; font-size: 12px; padding: 10px 0 0; display: inline-block;}
+div.mainContent table.comitteeTable2 tr td .red3 { color: #ff6b56; font-size: 12px; padding:0; display: inline-block;}
+
+div.comitteeTable3 table tr th {border-right:none}
+div.comitteeTable3 table tr td {border-right:none}
+
+div.cmBtnBox {margin:20px 0 0 0; overflow:hidden;}
+div.cmBtnBox2 {margin:20px 0; overflow:hidden; text-align:right;}
+
+div.cmBtnBox2 .btn_gray{padding-left:10px; padding-right:10px;}
+
+div.cmAddfile{margin:10px 0 20px 0; }
+
+div.boardView2 table input[type="checkbox"].emailckb {width: 18px; height: 30px; line-height:30px; margin: 0 5px;}
+div.boardView2 table td label{line-height:30px;}
+
+
+p.pwchangeBox{margin:20px 0;}
+input.pwchange1,
+input.pwchange2,
+input.pwchange3{height:50px; font-size:15px; width:94%; padding:0 10px; }
+
+input.pwchange2{border-top:0; border-bottom:0; border-left:1px solid #a9a9a9; border-right:1px solid #a9a9a9; padding-left:12px;}
+
+
+
+
+
+
+
+
